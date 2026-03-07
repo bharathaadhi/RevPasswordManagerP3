@@ -1,11 +1,10 @@
 package com.rev.userservice.controller;
+
 import com.rev.userservice.dto.*;
 import com.rev.userservice.model.User;
 import com.rev.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import com.rev.userservice.dto.TwoFactorRequest;
-import com.rev.userservice.dto.RefreshTokenRequest;
 
 @RestController
 @RequestMapping("/api/auth")
