@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local configuration (do not push passwords)
+**/application-local.properties
