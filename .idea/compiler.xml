@@ -6,6 +6,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="notfication-service" />
       </profile>
       <profile name="Annotation profile for security-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -14,9 +15,17 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
         </processorPath>
-        <module name="config-server" />
         <module name="security-service" />
+      </profile>
+      <profile name="Annotation profile for vault-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+        </processorPath>
         <module name="api-gateway" />
+        <module name="config-server" />
         <module name="vault-service" />
         <module name="user-service" />
         <module name="generator-service" />
@@ -27,6 +36,7 @@
       <module name="api-gateway (1)" target="1.5" />
       <module name="config-server (1)" target="1.5" />
       <module name="eureka-server (1)" target="1.5" />
+      <module name="notification-service" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -35,6 +45,8 @@
       <module name="config-server" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
       <module name="generator-service" options="-parameters" />
+      <module name="notfication-service" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
       <module name="security-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
       <module name="vault-service" options="-parameters" />

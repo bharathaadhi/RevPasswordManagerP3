@@ -1,15 +1,17 @@
-package com.rev.userservice;
+package com.revpassword.notficationservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
+@EnableDiscoveryClient
 @EnableFeignClients
-public class UserServiceApplication {
+public class NotficationServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(UserServiceApplication.class, args);
+        SpringApplication.run(NotficationServiceApplication.class, args);
     }
 
 }
