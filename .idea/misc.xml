@@ -11,7 +11,14 @@
         <option value="$PROJECT_DIR$/generator-service/pom.xml" />
         <option value="$PROJECT_DIR$/security-service/pom.xml" />
         <option value="$PROJECT_DIR$/vault-service/pom.xml" />
+        <option value="$PROJECT_DIR$/api-gateway/notification-service/pom.xml" />
+        <option value="$PROJECT_DIR$/notfication-service/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/api-gateway/notification-service/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="17" project-jdk-type="JavaSDK">
