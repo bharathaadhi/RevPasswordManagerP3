@@ -2,25 +2,19 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-      </profile>
-      <profile name="Annotation profile for security-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
-        </processorPath>
         <module name="config-server" />
         <module name="security-service" />
         <module name="api-gateway" />
-        <module name="vault-service" />
-        <module name="user-service" />
         <module name="generator-service" />
+        <module name="user-service" />
+        <module name="vault-service" />
         <module name="eureka-server" />
+        <module name="notification-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -35,6 +29,7 @@
       <module name="config-server" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
       <module name="generator-service" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
       <module name="security-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
       <module name="vault-service" options="-parameters" />

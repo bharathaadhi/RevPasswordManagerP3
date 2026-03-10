@@ -1,0 +1,114 @@
+<div class="audit-wrapper">
+
+  <h2 class="audit-title">🛡 Security Audit Report</h2>
+
+  <!-- ================= SCORE SECTION ================= -->
+
+  <div class="score-section">
+
+    <div class="gauge-container">
+
+      <svg viewBox="0 0 120 120">
+        <circle class="bg" cx="60" cy="60" r="50"></circle>
+        <circle class="progress" cx="60" cy="60" r="50" [style.strokeDashoffset]="314 - (314 * securityScore / 100)">
+        </circle>
+      </svg>
+
+      <div class="score-text">
+        {{ securityScore }}%
+      </div>
+
+    </div>
+
+    <div class="risk-info">
+      <h3>
+        {{ securityScore >= 80 ? 'Low Risk ✅' :
+        securityScore >= 50 ? 'Medium Risk ⚠' :
+        'High Risk 🚨' }}
+      </h3>
+
+      <p>
+        {{ weakPasswords.length + reusedPasswords.length + oldPasswords.length }} issue(s) detected </p>
+
+      <button (click)="fixWeakPasswords()" class="fix-btn">
+        🔧 Fix Now
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- ================= STATS ================= -->
+
+  <div class="audit-stats">
+
+    <div class="audit-card red">
+      <h4>Weak Passwords</h4>
+      <h1>{{ weakPasswords.length }}</h1>
+    </div>
+
+    <div class="audit-card purple">
+      <h4>Reused Passwords</h4>
+      <h1>{{ reusedPasswords.length }}</h1>
+    </div>
+
+  </div>
+
+  <!-- ================= WEAK PASSWORDS ================= -->
+
+  <div class="audit-section">
+
+    <h3>Weak Passwords</h3>
+
+    <div *ngIf="weakPasswords.length > 0">
+      <div class="audit-row" *ngFor="let entry of weakPasswords">
+        <span>{{ entry.platform }}</span>
+        <span class="badge danger">Weak</span>
+      </div>
+    </div>
+
+    <p *ngIf="weakPasswords.length === 0">
+      No weak passwords 🎉
+    </p>
+
+  </div>
+
+  <!-- ================= REUSED PASSWORDS ================= -->
+
+  <div class="audit-section">
+
+    <h3>Reused Passwords</h3>
+
+    <div *ngIf="reusedPasswords.length > 0">
+      <div class="audit-row" *ngFor="let entry of reusedPasswords">
+        <span>{{ entry.platform }}</span>
+        <span class="badge warning">Reused</span>
+      </div>
+    </div>
+
+    <p *ngIf="reusedPasswords.length === 0">
+      No reused passwords 🎉
+    </p>
+
+  </div>
+
+</div>
+
+<!-- ================= OLD PASSWORDS ================= -->
+
+<div class="audit-section">
+
+  <h3>Old Passwords (90+ Days)</h3>
+
+  <div *ngIf="oldPasswords.length > 0">
+    <div class="audit-row" *ngFor="let entry of oldPasswords">
+      <span>{{ entry.platform }}</span>
+      <span class="badge warning">Old</span>
+    </div>
+  </div>
+
+  <p *ngIf="oldPasswords.length === 0">
+    No old passwords 🎉
+  </p>
+
+</div>

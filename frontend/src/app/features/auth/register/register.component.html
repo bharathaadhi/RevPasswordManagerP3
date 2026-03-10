@@ -1,0 +1,174 @@
+<div class="register-wrapper">
+
+  <!-- ================= LEFT SIDE ================= -->
+  <div class="branding-section">
+    <div class="branding-content">
+
+      <h1>REV Secure Vault</h1>
+
+      <p class="tagline">
+        Protect your digital identity with military-grade encryption.
+      </p>
+
+      <div class="features">
+        <div>🔐 End-to-End Encryption</div>
+        <div>⚡ Instant Secure Access</div>
+        <div>🛡 Advanced Security Layers</div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ================= RIGHT SIDE ================= -->
+  <div class="form-section">
+
+    <div class="register-card">
+
+      <h2>Create Account</h2>
+
+      <!-- STEP TEXT (ONLY FOR FORM STEPS) -->
+      <p class="sub-text" *ngIf="step !== 3">
+        Step {{step}} of 2
+      </p>
+
+      <!-- ================= SUCCESS SCREEN ================= -->
+      <div *ngIf="step === 3">
+
+        <div class="success-msg">
+          {{ successMessage }}
+        </div>
+
+        <button type="button"
+                class="register-btn"
+                (click)="goToLogin()">
+          Go to Login →
+        </button>
+
+      </div>
+
+      <!-- ================= FORM (STEP 1 & 2 ONLY) ================= -->
+      <form *ngIf="step !== 3"
+            (ngSubmit)="register()"
+            autocomplete="off">
+
+        <!-- ================= ERROR MESSAGE ================= -->
+        <div *ngIf="errorMessage" class="error-msg">
+          {{ errorMessage }}
+        </div>
+
+        <!-- ================= STEP 1 ================= -->
+        <div *ngIf="step === 1">
+
+          <div class="input-group">
+            <input type="text"
+                   placeholder="Username"
+                   [(ngModel)]="registerData.username"
+                   name="username"
+                   required />
+          </div>
+
+          <div class="input-group">
+            <input type="email"
+                   placeholder="Email"
+                   [(ngModel)]="registerData.email"
+                   name="email"
+                   required />
+          </div>
+
+          <div class="input-group">
+            <input type="text"
+                   placeholder="Phone Number"
+                   [(ngModel)]="registerData.phone"
+                   name="phone" />
+          </div>
+
+          <div class="input-group password-wrapper">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              placeholder="Master Password"
+              [(ngModel)]="registerData.masterPassword"
+              name="masterPassword"
+              required />
+
+            <span class="eye-icon"
+                  (click)="togglePassword()">👁</span>
+          </div>
+
+          <button type="button"
+                  class="register-btn"
+                  (click)="nextStep()">
+            Next →
+          </button>
+
+        </div>
+
+
+        <!-- ================= STEP 2 ================= -->
+        <div *ngIf="step === 2">
+
+          <div class="security-section">
+            <h3>Security Questions</h3>
+
+            <div class="question-block"
+                 *ngFor="let q of registerData.securityQuestions; let i = index">
+
+              <div class="select-wrapper">
+                <select
+                  [(ngModel)]="q.question"
+                  name="question{{i}}"
+                  required>
+
+                  <option value="">Select Question {{i+1}}</option>
+
+                  <option *ngFor="let option of securityQuestionOptions"
+                          [value]="option">
+                    {{option}}
+                  </option>
+
+                </select>
+              </div>
+
+              <input type="text"
+                     placeholder="Answer"
+                     [(ngModel)]="q.answer"
+                     name="answer{{i}}"
+                     required />
+
+            </div>
+          </div>
+
+          <button type="button"
+                  class="back-btn"
+                  (click)="previousStep()">
+            ← Back
+          </button>
+
+          <button type="submit"
+                  class="register-btn">
+            Create Secure Vault
+          </button>
+
+        </div>
+
+
+        <!-- ================= LOGIN NAVIGATION ================= -->
+        <div class="register-link">
+
+          Already have an account?
+
+          <button type="button"
+                  class="login-link-btn"
+                  (click)="goToLogin()">
+            Login
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>

@@ -11,6 +11,7 @@
         <option value="$PROJECT_DIR$/generator-service/pom.xml" />
         <option value="$PROJECT_DIR$/security-service/pom.xml" />
         <option value="$PROJECT_DIR$/vault-service/pom.xml" />
+        <option value="$PROJECT_DIR$/notification-service/pom.xml" />
       </list>
     </option>
   </component>

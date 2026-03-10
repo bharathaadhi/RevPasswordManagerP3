@@ -1,0 +1,79 @@
+<div class="generator-wrapper">
+
+  <div class="card generator-card">
+
+    <h2>🔐 Password Generator</h2>
+
+    <!-- OPTIONS -->
+
+    <label>Length: {{ length }}</label>
+    <input type="range" min="8" max="64" [(ngModel)]="length">
+
+    <div class="options">
+      <label><input type="checkbox" [(ngModel)]="includeUpper"> Uppercase</label>
+      <label><input type="checkbox" [(ngModel)]="includeLower"> Lowercase</label>
+      <label><input type="checkbox" [(ngModel)]="includeNumbers"> Numbers</label>
+      <label><input type="checkbox" [(ngModel)]="includeSymbols"> Symbols</label>
+    </div>
+
+    <button class="btn" (click)="generate()">
+      Generate Passwords
+    </button>
+
+    <!-- PREMIUM ANALYZER -->
+
+    <div *ngIf="selectedPassword" class="analyzer">
+
+      <h3>Selected Password</h3>
+      <div class="password-preview">
+        {{ selectedPassword }}
+      </div>
+
+      <!-- Strength bar -->
+      <div class="strength-bar">
+        <div class="strength-fill"
+             [style.width.%]="strengthPercent">
+        </div>
+      </div>
+
+      <!-- checklist -->
+      <div class="checklist">
+
+        <div [class.ok]="hasUpper()">✔ Uppercase</div>
+        <div [class.ok]="hasLower()">✔ Lowercase</div>
+        <div [class.ok]="hasNumber()">✔ Number</div>
+        <div [class.ok]="hasSymbol()">✔ Symbol</div>
+
+      </div>
+
+      <div class="actions">
+        <button class="btn" (click)="copyToClipboard()">
+          {{ copied ? 'Copied' : 'Copy' }}
+        </button>
+
+        <button class="btn" (click)="saveToVault()">
+          Save To Vault
+        </button>
+      </div>
+
+    </div>
+
+    <!-- GENERATED LIST -->
+    <div *ngIf="generatedPasswords.length > 0">
+
+      <h3>Generated Passwords</h3>
+
+      <div *ngFor="let pass of generatedPasswords"
+           (click)="selectPassword(pass)"
+           class="password-item"
+           [class.selected]="selectedPassword === pass">
+
+        {{ pass }}
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

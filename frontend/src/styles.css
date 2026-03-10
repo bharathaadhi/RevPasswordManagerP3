@@ -1,0 +1,206 @@
+/* ========================= */
+/* ULTRA PREMIUM DARK SAAS THEME */
+/* ========================= */
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: Inter, sans-serif;
+  background: radial-gradient(circle at 20% 20%, #1b2a4a, #0a0f1c 70%);
+  color: #e2e8f0;
+  overflow-x: hidden;
+}
+
+/* ===== GLOBAL SMOOTHNESS ===== */
+
+* {
+  box-sizing: border-box;
+}
+
+/* ================= PREMIUM GLASS CARD ================= */
+
+.card {
+  background: rgba(15,23,42,0.85);
+  backdrop-filter: blur(25px);
+  border-radius: 20px;
+  padding: 28px;
+  margin-bottom: 25px;
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px) scale(1.01);
+}
+
+/* ================= BUTTONS ================= */
+
+.btn {
+  padding: 12px 22px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background: linear-gradient(135deg,#2563eb,#9333ea);
+  color: white;
+}
+
+.btn:hover {
+  transform: scale(1.07);
+  box-shadow: 0 0 18px rgba(147,51,234,0.5);
+}
+
+.btn-danger {
+  background: #ef4444;
+}
+
+/* ================= INPUTS ================= */
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.05);
+  background: #020617;
+  color: white;
+}
+
+input:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56,189,248,0.3);
+}
+
+/* ================= PAGE TRANSITION ================= */
+
+.page-wrapper {
+  animation: fadeInPage 0.5s ease;
+}
+
+@keyframes fadeInPage {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+/* ================= MATERIAL DIALOG DARK THEME ================= */
+
+/* Dialog Background */
+.mat-mdc-dialog-container {
+  background: #020617 !important;
+  color: #e2e8f0 !important;
+  border-radius: 18px !important;
+}
+
+/* Form Field Width */
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+/* Remove White Outline */
+.mdc-notched-outline__leading,
+.mdc-notched-outline__notch,
+.mdc-notched-outline__trailing {
+  border-color: rgba(255,255,255,0.15) !important;
+}
+
+/* Input Background */
+.mat-mdc-text-field-wrapper {
+  background: #020617 !important;
+  border-radius: 10px;
+}
+
+/* Input Text */
+.mat-mdc-input-element {
+  color: #e2e8f0 !important;
+}
+
+/* Label */
+.mdc-floating-label {
+  color: #94a3b8 !important;
+}
+
+/* Focus Glow */
+.mat-mdc-form-field.mat-focused
+.mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused
+.mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-focused
+.mdc-notched-outline__trailing {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 10px rgba(99,102,241,.5);
+}
+
+/* Buttons */
+.mat-mdc-raised-button.mat-primary {
+  background: linear-gradient(135deg,#6366f1,#9333ea);
+}
+
+/* =====================================================
+   FINAL MATERIAL OVERLAY FIX (SAFE ADDITION)
+===================================================== */
+
+/* Target dialog overlay specifically */
+.cdk-overlay-container .mat-mdc-dialog-container {
+  background: #0f172a !important;
+}
+
+/* REMOVE WHITE OUTLINE COMPLETELY */
+.cdk-overlay-container
+.mdc-notched-outline__leading,
+.cdk-overlay-container
+.mdc-notched-outline__notch,
+.cdk-overlay-container
+.mdc-notched-outline__trailing {
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* DARK INPUT FIELD */
+.cdk-overlay-container
+.mat-mdc-text-field-wrapper {
+  background-color: #020617 !important;
+}
+
+/* LABEL COLOR */
+.cdk-overlay-container
+.mdc-floating-label {
+  color: #94a3b8 !important;
+}
+
+/* INPUT TEXT */
+.cdk-overlay-container
+.mat-mdc-input-element {
+  color: #e2e8f0 !important;
+}
+
+/* PREMIUM FOCUS */
+.cdk-overlay-container
+.mat-mdc-form-field.mat-focused
+.mdc-notched-outline__leading,
+.cdk-overlay-container
+.mat-mdc-form-field.mat-focused
+.mdc-notched-outline__notch,
+.cdk-overlay-container
+.mat-mdc-form-field.mat-focused
+.mdc-notched-outline__trailing {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 12px rgba(99,102,241,.6);
+}

@@ -45,11 +45,23 @@ public class SecurityAuditService {
 
         for (String password : passwords) {
 
-            if (password.length() < 6) {
+            if (password.length() < 8 || !password.matches(".*[A-Z].*") || !password.matches(".*[0-9].*")) {
                 weakPasswords.add(password);
             }
         }
 
         return weakPasswords;
+    }
+
+    public com.rev.security.dto.SecurityAuditResponse generateAuditReport(List<String> passwords) {
+        int weakCount = countWeakPasswords(passwords);
+        int reusedCount = countReusedPasswords(passwords);
+        List<String> weakList = findWeakPasswords(passwords);
+        
+        String overallStatus = (weakCount == 0 && reusedCount == 0) ? "Excellent" : (weakCount < 2 ? "Good" : "Warning");
+        
+        // Match the constructor in SecurityAuditResponse.java:
+        // int weakPasswords, int reusedPasswords, int leakedPasswords, List<String> weakPasswordList, List<String> leakedPasswordList, String overallStatus
+        return new com.rev.security.dto.SecurityAuditResponse(weakCount, reusedCount, 0, weakList, new ArrayList<>(), overallStatus);
     }
 }

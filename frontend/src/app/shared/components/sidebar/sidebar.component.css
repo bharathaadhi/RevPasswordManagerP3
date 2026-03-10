@@ -1,0 +1,66 @@
+/* ================= SIDEBAR ================= */
+.sidebar {
+  width: 260px;
+  background: linear-gradient(180deg,#020617,#0f172a);
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+
+/* ================= LOGO SECTION ================= */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 35px;
+}
+
+/* ✅ FIXED LOGO IMAGE */
+.logo-img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* LOGO TEXT */
+.logo-text {
+  font-size: 19px;
+  font-weight: 600;
+  color: #38bdf8;
+  white-space: nowrap;
+}
+
+
+/* ================= NAV LINKS ================= */
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nav-links a {
+  padding: 12px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #cbd5e1;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* HOVER */
+.nav-links a:hover {
+  background: rgba(255,255,255,0.05);
+  transform: translateX(6px);
+}
+
+/* ACTIVE MENU */
+.nav-links a.active {
+  background: linear-gradient(135deg,#2563eb,#9333ea);
+  color: white;
+  box-shadow: 0 4px 14px rgba(147,51,234,0.4);
+}

@@ -1,32 +1,31 @@
 package com.rev.userservice.dto;
 
-public class RegisterRequest {
+import lombok.Data;
+import java.util.List;
 
+@Data
+public class RegisterRequest {
     private String name;
+    private String username;   // frontend sends 'username'
     private String email;
     private String password;
+    private String masterPassword;  // frontend sends 'masterPassword'
+    private String phone;
+    private List<SecurityQuestionItem> securityQuestions;
 
-    public String getName() {
-        return name;
+    // Helper: get the actual name (frontend sends 'username')
+    public String getEffectiveName() {
+        return name != null ? name : username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    // Helper: get the actual password (frontend sends 'masterPassword')
+    public String getEffectivePassword() {
+        return password != null ? password : masterPassword;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    @Data
+    public static class SecurityQuestionItem {
+        private String question;
+        private String answer;
     }
 }

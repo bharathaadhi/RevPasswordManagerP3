@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/security")
@@ -24,6 +25,19 @@ public class SecurityController {
         String result = passwordStrengthService.checkStrength(request.getPassword());
 
         return new PasswordStrengthResponse(result);
+    }
+
+    @Autowired
+    private PasswordLeakedService passwordLeakedService;
+
+    @PostMapping("/check-leaked")
+    public boolean checkLeaked(@RequestBody PasswordRequest request) {
+        return passwordLeakedService.isLeaked(request.getPassword());
+    }
+
+    @PostMapping("/check-leaked-batch")
+    public List<Boolean> checkLeakedBatch(@RequestBody List<String> passwords) {
+        return passwords.stream().map(passwordLeakedService::isLeaked).collect(Collectors.toList());
     }
 
     @Autowired
@@ -52,15 +66,8 @@ public class SecurityController {
     private SecurityAuditService securityAuditService;
 
     @PostMapping("/audit")
-    public SecurityAuditResponse auditPasswords(@RequestBody SecurityAuditRequest request) {
-
-        int total = request.getPasswords().size();
-
-        int weak = securityAuditService.countWeakPasswords(request.getPasswords());
-
-        int reused = securityAuditService.countReusedPasswords(request.getPasswords());
-
-        return new SecurityAuditResponse(total, weak, reused);
+    public SecurityAuditResponse getAuditReport(@RequestBody SecurityAuditRequest request) {
+        return securityAuditService.generateAuditReport(request.getPasswords());
     }
 
     @PostMapping("/weak-passwords")

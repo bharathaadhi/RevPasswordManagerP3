@@ -1,5 +1,6 @@
 package com.rev.generatorservice.controller;
 
+
 import com.rev.generatorservice.dto.GeneratorRequestDto;
 import com.rev.generatorservice.dto.GeneratorResponseDto;
 import com.rev.generatorservice.dto.VaultRequestDto;
@@ -25,10 +26,10 @@ public class GeneratorController {
 
         GeneratorRequestDto dto = new GeneratorRequestDto();
         dto.setLength(12);
-        dto.setUppercase(true);
-        dto.setLowercase(true);
-        dto.setNumbers(true);
-        dto.setSymbols(true);
+        dto.setUpper(true);
+        dto.setLower(true);
+        dto.setNumber(true);
+        dto.setSpecial(true);
         dto.setExcludeSimilar(true);
 
         return generatorService.generateAndSave(dto, vaultDto);

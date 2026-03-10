@@ -1,0 +1,43 @@
+<div class="notification-wrapper">
+  <div class="bell-icon" (click)="toggleDropdown()">
+    <i class="fas fa-bell"></i>
+    <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+  </div>
+
+  <div class="dropdown-menu" *ngIf="showDropdown">
+    <div class="dropdown-header">
+      <h4>Notifications</h4>
+    </div>
+    <div class="dropdown-body">
+      <div class="empty-state" *ngIf="notifications.length === 0">
+        No new notifications
+      </div>
+      <div 
+        class="notification-item" 
+        *ngFor="let n of notifications" 
+        [ngClass]="{'unread': !n.read && !n.readStatus}">
+        
+        <div class="notif-content">
+          <div class="notif-title">
+            <i class="fas" [ngClass]="{
+              'fa-shield-alt text-success': n.type === 'SECURITY',
+              'fa-exclamation-triangle text-warning': n.type === 'ALERT',
+              'fa-info-circle text-info': n.type === 'INFO'
+            }"></i>
+            {{ n.title }}
+          </div>
+          <div class="notif-desc">{{ n.message }}</div>
+          <div class="notif-time" *ngIf="n.timestamp">{{ n.timestamp | date:'MMM d, h:mm a' }}</div>
+        </div>
+        
+        <button 
+          class="mark-read-btn" 
+          *ngIf="!n.read && !n.readStatus" 
+          (click)="markAsRead(n, $event)"
+          title="Mark as read">
+          <i class="fas fa-check"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

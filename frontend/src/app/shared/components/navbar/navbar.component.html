@@ -1,0 +1,51 @@
+<header class="navbar">
+
+  <!-- LEFT SECTION -->
+  <div class="navbar-left">
+
+    <div class="product">
+      <span class="lock-icon">🔐</span>
+      <span class="app-name">Rev Password Manager</span>
+    </div>
+
+    <!-- LIVE SECURITY STATUS -->
+    <div class="security-pill">
+      <span class="pulse"></span>
+      Vault Protected
+    </div>
+
+  </div>
+
+
+  <!-- RIGHT SECTION -->
+  <div class="navbar-right" style="display: flex; align-items: center; gap: 20px;">
+
+    <!-- NOTIFICATION BELL -->
+    <app-notification></app-notification>
+
+    <!-- AVATAR -->
+    <div class="avatar-wrapper" (click)="toggleMenu()">
+
+      <div class="avatar">
+        👤
+      </div>
+
+      <!-- DROPDOWN -->
+      <div class="dropdown" *ngIf="menuOpen">
+
+        <div class="dropdown-item" routerLink="/profile">
+          👤 Profile
+        </div>
+
+        <div class="dropdown-item logout"
+             (click)="logout()">
+          🚪 Logout
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</header>

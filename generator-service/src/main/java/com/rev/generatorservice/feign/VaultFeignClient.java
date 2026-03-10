@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface VaultFeignClient {
 
     @PostMapping("/vault/save")
-    String saveToVault(@RequestBody VaultRequestDto dto);
+    Object saveToVault(@RequestBody VaultRequestDto dto);
 }

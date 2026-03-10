@@ -35,10 +35,10 @@ public class GeneratorServiceImpl implements GeneratorService {
 
         String characters = "";
 
-        if (dto.isUppercase()) characters += upper;
-        if (dto.isLowercase()) characters += lower;
-        if (dto.isNumbers()) characters += nums;
-        if (dto.isSymbols()) characters += symbols;
+        if (dto.isUpper()) characters += upper;
+        if (dto.isLower()) characters += lower;
+        if (dto.isNumber()) characters += nums;
+        if (dto.isSpecial()) characters += symbols;
 
         if (characters.isEmpty()) {
             throw new RuntimeException("Select at least one character type");
@@ -62,6 +62,7 @@ public class GeneratorServiceImpl implements GeneratorService {
         GeneratorResponseDto generated = generatePassword(dto);
 
         vaultDto.setEncryptedPassword(generated.getPassword());
+        vaultDto.setStrength(generated.getStrength());
 
         vaultFeignClient.saveToVault(vaultDto);
 
@@ -89,7 +90,9 @@ public class GeneratorServiceImpl implements GeneratorService {
 
         List<String> passwords = new ArrayList<>();
 
-        for (int i = 0; i < 5; i++) {
+        int iterations = dto.getCount() > 0 ? dto.getCount() : 5;
+
+        for (int i = 0; i < iterations; i++) {
             passwords.add(generatePassword(dto).getPassword());
         }
 

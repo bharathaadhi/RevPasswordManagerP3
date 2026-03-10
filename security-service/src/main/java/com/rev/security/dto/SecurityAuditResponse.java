@@ -1,26 +1,18 @@
 package com.rev.security.dto;
 
-public class SecurityAuditResponse {
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    private int totalPasswords;
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class SecurityAuditResponse {
     private int weakPasswords;
     private int reusedPasswords;
-
-    public SecurityAuditResponse(int totalPasswords, int weakPasswords, int reusedPasswords) {
-        this.totalPasswords = totalPasswords;
-        this.weakPasswords = weakPasswords;
-        this.reusedPasswords = reusedPasswords;
-    }
-
-    public int getTotalPasswords() {
-        return totalPasswords;
-    }
-
-    public int getWeakPasswords() {
-        return weakPasswords;
-    }
-
-    public int getReusedPasswords() {
-        return reusedPasswords;
-    }
+    private int leakedPasswords;
+    private List<String> weakPasswordList;
+    private List<String> leakedPasswordList;
+    private String overallStatus;
 }

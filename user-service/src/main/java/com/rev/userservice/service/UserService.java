@@ -7,9 +7,9 @@ public interface UserService {
 
     String login(LoginRequest request);
 
-    String saveSecurityQuestion(SecurityQuestionRequest request);
+    String saveSecurityQuestion(SecurityAnswerUpdateDto request);
 
-    String recoverAccount(SecurityQuestionRequest request);
+    String recoverAccount(ForgotPasswordDto request);
 
     String resetPassword(ResetPasswordRequest request);
 
@@ -18,4 +18,8 @@ public interface UserService {
     String verify2FACode(TwoFactorRequest request);
 
     String refreshToken(RefreshTokenRequest request);
+    User updateProfile(String email, RegisterRequest request);
+    String logout(String email);
+    boolean verifyMasterPassword(MasterPasswordDto dto);
+    String updateMasterPassword(UpdateMasterPasswordRequest request);
 }

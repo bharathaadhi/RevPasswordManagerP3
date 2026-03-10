@@ -6,8 +6,9 @@ import lombok.Data;
 public class GeneratorRequestDto {
     private boolean excludeSimilar;
     private int length;
-    private boolean uppercase;
-    private boolean lowercase;
-    private boolean numbers;
-    private boolean symbols;
+    private int count;
+    private boolean upper;
+    private boolean lower;
+    private boolean number;
+    private boolean special;
 }

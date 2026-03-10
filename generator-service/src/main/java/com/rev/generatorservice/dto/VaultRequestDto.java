@@ -11,4 +11,5 @@ public class VaultRequestDto {
     private String encryptedPassword;
     private String category;
     private boolean favorite;
+    private String strength;
 }

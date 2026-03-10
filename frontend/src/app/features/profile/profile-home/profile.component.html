@@ -1,0 +1,165 @@
+<div class="profile-container">
+
+  <h2 class="title">👤 Profile Settings</h2>
+
+  <!-- ================= TABS ================= -->
+  <div class="tabs">
+
+    <div class="tab-indicator" [style.left.%]="activeTab==='account'?0:
+                         activeTab==='security'?33.3:66.6">
+    </div>
+
+    <button (click)="setTab('account')" [class.active]="activeTab==='account'">
+      Account Info
+    </button>
+
+    <button (click)="setTab('security')" [class.active]="activeTab==='security'">
+      Security
+    </button>
+
+    <button (click)="setTab('overview')" [class.active]="activeTab==='overview'">
+      Security Overview
+    </button>
+
+  </div>
+
+  <div class="tab-content">
+
+    <!-- ================= ACCOUNT ================= -->
+    <div class="card premium-card" *ngIf="activeTab==='account'">
+
+      <label>Name</label>
+      <input [(ngModel)]="name" readonly [disabled]="true">
+
+      <label>Email</label>
+      <input [(ngModel)]="email">
+
+      <label>Phone</label>
+      <input [(ngModel)]="phone">
+
+      <button class="btn" (click)="saveProfile()">
+        Save Changes
+      </button>
+
+    </div>
+
+    <!-- ================= SECURITY ================= -->
+    <div class="card premium-card" *ngIf="activeTab==='security'">
+
+      <h3>🔐 Change Master Password</h3>
+
+      <!-- CURRENT -->
+      <div class="password-group">
+        <input [type]="showCurrent?'text':'password'" placeholder="Current" [(ngModel)]="currentMasterPassword">
+
+        <i class="eye" (click)="showCurrent=!showCurrent">
+          👁
+        </i>
+      </div>
+
+      <!-- NEW -->
+      <div class="password-group">
+        <input [type]="showNew?'text':'password'" placeholder="New" [(ngModel)]="newMasterPassword"
+          (input)="checkStrength()">
+
+        <i class="eye" (click)="showNew=!showNew">
+          👁
+        </i>
+      </div>
+
+      <!-- CONFIRM -->
+      <div class="password-group">
+        <input [type]="showConfirm?'text':'password'" placeholder="Confirm" [(ngModel)]="confirmMasterPassword">
+
+        <i class="eye" (click)="showConfirm=!showConfirm">
+          👁
+        </i>
+      </div>
+
+      <p class="strength">
+        Strength: {{passwordStrength}}
+      </p>
+
+      <button class="btn" (click)="updateMasterPassword()">
+        Update Password
+      </button>
+
+      <!-- ================= 2FA Enable / Disable ================= -->
+
+      <div class="twofa-card">
+
+        <h3>🔐 Two Factor Authentication</h3>
+
+        <div class="twofa-row">
+
+          <span>
+            Status:
+            <b [ngClass]="twoFactorEnabled ? 'enabled' : 'disabled'">
+              {{ twoFactorEnabled ? 'Enabled' : 'Disabled' }}
+            </b>
+          </span>
+
+          <label class="switch">
+            <input type="checkbox" [checked]="twoFactorEnabled" (change)="toggle2FA($event)" />
+            <span class="slider"></span>
+          </label>
+
+        </div>
+
+      </div>
+
+      <!-- ================= SECURITY QUESTIONS ================= -->
+
+      <h3>❓ Security Questions</h3>
+
+      <div class="question-box" *ngFor="let q of securityQuestions; let i=index">
+
+        <input class="question" [value]="q.question" readonly>
+
+        <input class="answer" [(ngModel)]="answers[i]" placeholder="Update Answer">
+      </div>
+
+      <button class="btn" (click)="updateAnswers()">
+        Update Answers
+      </button>
+
+    </div>
+
+    <!-- ================= OVERVIEW ================= -->
+    <div class="card premium-card overview" *ngIf="activeTab==='overview'">
+
+      <div class="security-grid">
+
+        <div class="security-box">
+          <span>Weak</span>
+          <h3>{{weakPasswords}}</h3>
+        </div>
+
+        <div class="security-box">
+          <span>Reused</span>
+          <h3>{{reusedPasswords}}</h3>
+        </div>
+
+        <div class="security-box">
+          <span>Old</span>
+          <h3>{{oldPasswords}}</h3>
+        </div>
+
+      </div>
+
+      <div class="score-wrapper">
+        <div class="progress-ring" [style.--score]="animatedScore">
+
+          <div class="progress-inner">
+            <h2>{{animatedScore}}%</h2>
+            <span>Security Score</span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

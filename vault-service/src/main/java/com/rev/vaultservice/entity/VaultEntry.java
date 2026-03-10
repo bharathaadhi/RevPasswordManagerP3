@@ -26,4 +26,12 @@ public class VaultEntry {
     private String category;
 
     private boolean favorite;
+    private String strength;
+
+    @org.hibernate.annotations.CreationTimestamp
+    @Column(updatable = false)
+    private java.time.LocalDateTime createdAt;
+
+    @org.hibernate.annotations.UpdateTimestamp
+    private java.time.LocalDateTime updatedAt;
 }
