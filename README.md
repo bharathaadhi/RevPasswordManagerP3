@@ -1,167 +1,440 @@
-🛡️ RevPasswordManager
+# Rev Password Manager
 
-RevPasswordManager is a secure, robust, and highly available microservices-based password management application built using Spring Boot and Spring Cloud.
+**Rev Password Manager** is a secure, scalable, and highly available **microservices-based password management application** built using **Spring Boot and Spring Cloud**.
 
-It allows users to:
+The system allows users to securely store account credentials, generate strong passwords, and evaluate password strength while ensuring protection through a **Master Password and JWT-based authentication**.
 
-Securely store vault credentials
+The application follows a **modern microservices architecture**, ensuring modular design, scalability, and secure service communication.
 
-Automatically evaluate password strength
+---
 
-Generate highly complex passwords
+## Project Overview
 
-Protect all sensitive information using a Master Password
+Rev Password Manager enables users to:
 
-The application is designed with scalability, security, and modular architecture in mind.
+- Securely store credentials in an encrypted password vault  
+- Automatically evaluate password strength  
+- Generate highly complex passwords  
+- Protect vault data using a master password  
+- Manage passwords across multiple accounts securely  
 
-🏗️ Architecture Stack
+The system is designed with **enterprise-grade security practices**, including encryption, token-based authentication, and modular service architecture.
 
-The application uses a modern microservices architecture to ensure scalability, maintainability, and separation of concerns.
+---
 
-Backend Framework
+## Key Features
 
-Java 17
+### Authentication & Security
 
-Spring Boot 3.2.3
+- Secure User Registration and Login  
+- JWT-based Authentication and Authorization  
+- Master Password Protection  
+- Two-Factor Authentication (2FA) Support  
+- Secure API Authorization  
+- HTTP Security Status Handling (401 / 403)
 
-Microservice Infrastructure
+---
 
-Spring Cloud Gateway
+### Password Vault Management
 
-Netflix Eureka
+- Secure storage of user credentials  
+- AES encryption for vault data  
+- Create new vault entries  
+- Retrieve stored passwords securely  
+- Update vault credentials  
+- Delete stored passwords safely  
 
-Database
+---
 
-MySQL / MariaDB
+### Password Generation
 
-Spring Data JPA
+- Generate strong passwords dynamically  
+- Customizable password parameters  
+- Adjustable password length  
+- Uppercase and symbol inclusion  
+- Automatic password complexity handling  
 
-Security
+---
 
-Spring Security
+### Security Audit
 
-JSON Web Tokens (JWT)
+- Password strength evaluation  
+- Weak password detection  
+- Internal security validation  
 
-Communication Between Services
+---
 
-OpenFeign Clients
+### Notification System
 
-Testing
+- Email notifications for security alerts  
+- Account activity notifications  
+- Asynchronous notification processing  
 
-JUnit
+---
 
-Mockito
+## Tech Stack
 
-📦 Microservices Configuration
+### Frontend
 
-The system is composed of several independent microservices.
+| Technology | Usage |
+|------------|------|
+| Angular | User Interface |
+| Angular Router | Application Navigation |
+| HttpClient | API Communication |
+| JWT Interceptor | Secure API Requests |
+| Custom CSS | UI Styling |
 
-config-server (Port: 8888)
-Centralized configuration management for all microservices.
+---
 
-eureka-server (Port: 8761)
-Service discovery registry where all microservices register themselves.
+### Backend
 
-api-gateway (Port: 8080)
-Acts as the single entry point for frontend clients. Handles routing, rate limiting, and cross-origin requests.
+| Technology | Usage |
+|------------|------|
+| Java 17 | Programming Language |
+| Spring Boot 3.2.3 | Backend Framework |
+| Spring Security | Authentication |
+| JWT | Authorization |
+| Spring Data JPA | ORM |
+| Hibernate | Persistence |
+| MySQL / MariaDB | Database |
+| BCrypt | Password Hashing |
+| AES Encryption | Vault Security |
+| OpenFeign | Microservice Communication |
 
-user-service (Port: 8081)
-Handles authentication, user registration, JWT generation, and Master Password verification.
+---
 
-security-service (Port: 8082)
-Evaluates password strength and performs security audits.
+## Microservices Architecture
 
-vault-service (Port: 8083)
-Manages AES-encrypted password vault entries including creation, retrieval, and updates.
+The application consists of several independent microservices working together.
 
-generator-service (Port: 8084)
-Generates complex passwords dynamically based on user-defined requirements such as length, symbols, and uppercase characters.
+| Service | Port | Description |
+|--------|------|-------------|
+| config-server | 8888 | Centralized configuration management |
+| eureka-server | 8761 | Service discovery registry |
+| api-gateway | 8080 | Entry point for frontend clients |
+| user-service | 8081 | User authentication and JWT generation |
+| security-service | 8082 | Password strength evaluation |
+| vault-service | 8083 | AES encrypted password vault storage |
+| generator-service | 8084 | Password generation service |
+| notification-service | 8085 | Email and alert notifications |
 
-notification-service (Port: 8085)
-Handles asynchronous notifications such as emails and security alerts.
+---
 
-✨ Key Features
+## Architecture
 
-Global Exception Handling
+The backend follows a **microservices architecture** where each service performs a dedicated responsibility.
 
-Provides consistent and clean ErrorResponse HTTP responses across all APIs.
+System flow:
 
-Microservice Communication
+Frontend → API Gateway → Eureka Service Discovery → Microservices → Database
 
-Uses OpenFeign for seamless and secure inter-service communication.
+Implemented using:
 
-Unit Testing Coverage
+- Spring Cloud Config Server  
+- Netflix Eureka Service Registry  
+- Spring Cloud Gateway Routing  
+- OpenFeign Inter-service Communication  
 
-Service layers are tested using JUnit and Mockito.
+---
 
-Security Validation
+## Project Structure
 
-Implements JWT token validation with proper HTTP status codes:
+### Backend Structure
 
-401 Unauthorized
 
-403 Forbidden
+src/main/java/com/rev
+│
+├── config-server
+├── eureka-server
+├── api-gateway
+│
+├── user-service
+├── security-service
+├── vault-service
+├── generator-service
+└── notification-service
 
-Password Generation
 
-Allows users to generate strong passwords with customizable parameters such as:
+---
 
-Length
+### Frontend Structure
 
-Symbols
 
-Uppercase characters
+src/app
+│
+├── core
+│ ├── services
+│ ├── guards
+│ └── interceptors
+│
+├── features
+│ ├── auth
+│ ├── dashboard
+│ ├── vault
+│ ├── generator
+│ └── profile
+│
+└── shared
 
-🚀 How to Run Locally
-Prerequisites
 
-Ensure the following are installed on your system:
+---
 
-JDK 17
+## Setup and Installation
 
-Maven
+### Prerequisites
 
-MySQL / MariaDB
+Ensure the following are installed:
 
-Also make sure your database credentials are configured correctly in the application properties.
+- Java JDK 17+
+- Maven
+- Node.js
+- Angular CLI
+- MySQL / MariaDB
+- IntelliJ IDEA or VS Code
 
-⚙️ Application Startup Order
+---
 
-To ensure proper service registration and communication, start the services in the following order:
+## Backend Setup
 
-1. Config Server
+Navigate to the project directory:
 
-Start the Config Server and wait until the console shows:
+
+cd RevPasswordManagerP3
+
+
+---
+
+## Configuration Management
+
+This project uses **Spring Cloud Config Server** for centralized configuration management.
+
+Instead of storing configuration inside each microservice, all configuration files are placed inside the **Config Server** under the `configs` directory.
+
+### Config Server Structure
+
+
+config-server
+└── src/main/resources
+└── configs
+├── api-gateway.properties
+├── user-service.properties
+├── security-service.properties
+├── vault-service.properties
+├── generator-service.properties
+└── notification-service.properties
+
+
+Each microservice loads its configuration from the **Config Server** during application startup.
+
+Example microservice configuration:
+
+
+spring.application.name=user-service
+spring.config.import=optional:configserver:http://localhost:8888
+
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+
+
+---
+
+## Environment Variables (.env)
+
+To protect sensitive information such as database passwords, the project uses a **`.env` file**.
+
+Database credentials are **not stored directly in configuration files**.
+
+Example `.env` file:
+
+
+DB_PASSWORD=your_database_password
+
+
+The `.env` file is excluded from version control using `.gitignore`.
+
+
+.env
+
+
+This ensures that sensitive credentials are **never exposed in the repository**.
+
+---
+
+## Database Configuration
+
+Database passwords are injected into configuration files using **environment variables**.
+
+Example configuration from `user-service.properties`:
+
+
+spring.datasource.url=jdbc:mysql://localhost:3306/user_service_db
+spring.datasource.username=root
+spring.datasource.password=${DB_PASSWORD}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+
+Using environment variables ensures:
+
+- Sensitive credentials are not stored in source code  
+- Database passwords remain secure  
+- Configuration is portable across environments  
+
+---
+
+## Config Server Endpoint
+
+The Config Server runs on:
+
+
+http://localhost:8888
+
+
+You can verify configuration loading by opening:
+
+
+http://localhost:8888/user-service/default
+
+
+This endpoint returns the configuration properties for the **user-service**.
+
+---
+
+## Run Backend Services
+
+Run each microservice using Maven or IntelliJ.
+
+
+mvn spring-boot:run
+
+
+---
+
+## Startup Order
+
+To ensure correct service registration, start the services in the following order.
+
+### 1️⃣ Config Server
+
+Wait until:
+
 
 Started ConfigServerApplication
-2. Eureka Server
 
-Start the Eureka Server and wait until:
+
+### 2️⃣ Eureka Server
+
+Wait until:
+
 
 Started EurekaServerApplication
-3. API Gateway
 
-Start the API Gateway and confirm:
+
+### 3️⃣ API Gateway
+
+Wait until:
+
 
 Started ApiGatewayApplication
-4. Remaining Microservices
 
-Now start the remaining services in any order:
 
-user-service
+### 4️⃣ Remaining Services
 
-security-service
+- user-service  
+- security-service  
+- vault-service  
+- generator-service  
+- notification-service  
 
-vault-service
+---
 
-generator-service
+## Service Monitoring
 
-notification-service
+Open the **Eureka Dashboard**:
 
-📊 Service Monitoring
-
-After starting all services, open the Eureka Dashboard:
 
 http://localhost:8761
 
-You should see all services registered and displaying UP status.
+
+You should see all services registered with status:
+
+
+UP
+
+
+---
+
+## Frontend Setup
+
+Navigate to the frontend directory:
+
+
+cd FrontEnd
+
+
+### Install Dependencies
+
+
+npm install
+
+
+### Run the Application
+
+
+ng serve
+
+
+---
+
+## Open Browser
+
+
+http://localhost:4200
+
+
+---
+
+## Important API Endpoints
+
+| Method | Endpoint | Description |
+|------|-----------|-------------|
+| POST | /api/auth/login | User Login |
+| POST | /api/auth/register | Register User |
+| GET | /api/vault | Retrieve Vault Data |
+| POST | /api/vault | Add Password |
+| PUT | /api/vault/{id} | Update Password |
+| POST | /api/generator | Generate Password |
+| POST | /api/security/check | Check Password Strength |
+
+---
+
+## Security Implementation
+
+- AES Encryption for vault storage  
+- JWT protected APIs  
+- Master password verification  
+- Secure service-to-service communication  
+- HTTP authentication status handling  
+
+---
+
+## Testing Performed
+
+- Authentication Flow  
+- Vault CRUD Operations  
+- Password Generation  
+- Security Evaluation  
+- Microservice Communication  
+
+---
+
+## Future Enhancements
+
+- Cloud Backup Integration  
+- Browser Extension Support  
+- Password Auto-fill  
+- Biometric Authentication  
+- Mobile Application  
+
+---
