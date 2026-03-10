@@ -1,0 +1,131 @@
+/* ================= WRAPPER ================= */
+
+.audit-wrapper {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* ================= SCORE SECTION ================= */
+
+.score-section {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.gauge-container {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+
+.gauge-container svg {
+  transform: rotate(-90deg);
+}
+
+.gauge-container circle {
+  fill: none;
+  stroke-width: 10;
+}
+
+.gauge-container .bg {
+  stroke: #1f2937;
+}
+
+.gauge-container .progress {
+  stroke: #38bdf8;
+  stroke-dasharray: 314;
+  transition: stroke-dashoffset 1s ease;
+  filter: drop-shadow(0 0 8px rgba(56,189,248,0.5));
+}
+
+.score-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.risk-info h3 {
+  margin-bottom: 10px;
+}
+
+.fix-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg,#2563eb,#3b82f6);
+  color: white;
+  margin-top: 10px;
+  transition: 0.2s ease;
+}
+
+.fix-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* ================= STATS ================= */
+
+.audit-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.audit-card {
+  padding: 22px;
+  border-radius: 18px;
+  color: white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  transition: 0.3s ease;
+}
+
+.audit-card:hover {
+  transform: translateY(-6px);
+}
+
+.red { background: linear-gradient(135deg,#7f1d1d,#ef4444); }
+.purple { background: linear-gradient(135deg,#7c3aed,#9333ea); }
+
+/* ================= LIST ================= */
+
+.audit-section {
+  margin-bottom: 30px;
+}
+
+.audit-row {
+  background: rgba(255,255,255,0.05);
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  transition: 0.2s ease;
+}
+
+.audit-row:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.badge.danger {
+  background: #ef4444;
+  color: white;
+}
+
+.badge.warning {
+  background: #f59e0b;
+  color: white;
+}

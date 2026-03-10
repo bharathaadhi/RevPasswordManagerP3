@@ -1,0 +1,154 @@
+/* ================= ULTRA NAVBAR ================= */
+.navbar {
+  height: 72px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 35px;
+
+  background: rgba(2,6,23,0.75);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+
+  box-shadow:
+    0 4px 30px rgba(0,0,0,0.5);
+}
+
+/* LEFT */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+/* PRODUCT */
+.product {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lock-icon {
+  font-size: 22px;
+}
+
+.app-name {
+  font-size: 21px;
+  font-weight: 600;
+  color: #e2e8f0;
+  letter-spacing: .3px;
+}
+
+/* SECURITY BADGE */
+.security-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 30px;
+
+  background: rgba(34,197,94,0.1);
+  color: #22c55e;
+  font-size: 14px;
+}
+
+/* PULSE DOT */
+.pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow:0 0 0 0 rgba(34,197,94,.7); }
+  70% { box-shadow:0 0 0 8px rgba(34,197,94,0); }
+  100% { box-shadow:0 0 0 0 rgba(34,197,94,0); }
+}
+
+/* RIGHT */
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+/* AVATAR */
+.avatar-wrapper {
+  position: relative;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+
+  background: linear-gradient(135deg,#6366f1,#9333ea);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: .35s;
+}
+
+.avatar:hover {
+  transform: scale(1.08);
+  box-shadow:
+      0 0 18px rgba(99,102,241,.7);
+}
+
+/* DROPDOWN */
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 58px;
+  width: 180px;
+
+  background: rgba(2,6,23,.95);
+  backdrop-filter: blur(10px);
+
+  border-radius: 14px;
+  overflow: hidden;
+
+  box-shadow:
+      0 18px 40px rgba(0,0,0,.6);
+
+  animation: drop .2s ease;
+}
+
+@keyframes drop {
+  from {
+    opacity:0;
+    transform:translateY(-10px);
+  }
+  to {
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.dropdown-item {
+  padding: 13px 18px;
+  cursor: pointer;
+  transition:.25s;
+}
+
+.dropdown-item:hover {
+  background:#1e293b;
+}
+
+.logout:hover {
+  background:#ef4444;
+}
+
+/* FIX DROPDOWN CLICK ISSUE */
+.navbar {
+  position: relative;
+  z-index: 1000;   /* higher than dashboard */
+}
+
+.dropdown {
+  z-index: 2000;   /* extra safety */
+}

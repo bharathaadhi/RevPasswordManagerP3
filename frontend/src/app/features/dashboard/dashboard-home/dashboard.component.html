@@ -1,0 +1,165 @@
+<div class="dashboard-page">
+
+  <!-- HEADER -->
+
+  <div class="dashboard-header">
+
+    <h2 class="dashboard-title">
+      👋 Welcome Back
+    </h2>
+
+    <p class="dashboard-subtitle">
+      Monitor your vault security and manage passwords efficiently.
+    </p>
+
+  </div>
+
+
+  <!-- SECURITY ALERT -->
+
+  <div *ngIf="weakPasswords > 0" class="security-alert">
+
+    <span>⚠️</span>
+
+    <div>
+      <strong>{{ weakPasswords }} weak passwords detected.</strong>
+      Improve your security now.
+    </div>
+
+  </div>
+
+
+  <!-- STATS -->
+
+  <div class="stats-grid">
+
+    <div class="stat-card blue">
+      <h4>Total Passwords</h4>
+      <h1>{{ totalPasswords }}</h1>
+    </div>
+
+    <div class="stat-card red">
+      <h4>Weak Passwords</h4>
+      <h1>{{ weakPasswords }}</h1>
+    </div>
+
+    <div class="stat-card purple">
+      <h4>Reused Passwords</h4>
+      <h1>{{ reusedPasswords }}</h1>
+    </div>
+
+    <div class="stat-card orange">
+      <h4>Old Passwords</h4>
+      <h1>{{ oldPasswords }}</h1>
+    </div>
+
+    <div class="stat-card green">
+      <h4>Security Score</h4>
+      <h1>{{ securityScore }}%</h1>
+    </div>
+
+  </div>
+
+
+  <!-- PANELS -->
+
+  <div class="dashboard-panels">
+
+    <!-- RECENT ACTIVITY -->
+
+    <div class="panel glass-panel">
+
+      <h3>🕒 Recent Activity</h3>
+
+      <div *ngIf="recentEntries.length > 0">
+
+        <div class="activity-row" *ngFor="let entry of recentEntries">
+
+          <div>
+            <strong>{{ entry.platform }}</strong>
+            <div class="sub">
+              Category: {{ entry.category }}
+            </div>
+          </div>
+
+          <span class="activity-date">
+            {{ entry.createdAt | date:'short' }}
+          </span>
+
+        </div>
+
+      </div>
+
+      <p *ngIf="recentEntries.length === 0">
+        No recent activity
+      </p>
+
+    </div>
+
+
+    <!-- SECURITY GAUGE -->
+
+    <div class="panel glass-panel gauge-panel">
+
+      <h3>🔐 Security Score</h3>
+
+      <div class="gauge">
+
+        <svg viewBox="0 0 120 120">
+
+          <circle class="bg" cx="60" cy="60" r="50"></circle>
+
+          <circle class="progress" cx="60" cy="60" r="50" [style.strokeDashoffset]="314 - (314 * securityScore / 100)">
+          </circle>
+
+        </svg>
+
+        <div class="score-text">
+          {{ securityScore }}%
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- FAVORITE PASSWORDS -->
+
+    <div class="panel glass-panel">
+
+      <h3>⭐ Favorite Passwords</h3>
+
+      <div *ngIf="favoritePasswords.length > 0">
+
+        <div class="activity-row" *ngFor="let fav of favoritePasswords">
+
+          <div class="fav-info">
+
+            <div class="fav-name">
+              {{ fav.platform }}
+            </div>
+
+            <div class="fav-category">
+              {{ fav.category }}
+            </div>
+
+          </div>
+
+          <button class="view-btn" (click)="viewPassword(fav.id)">
+
+            👁 View
+
+          </button>
+
+        </div>
+
+      </div>
+
+      <p *ngIf="favoritePasswords.length === 0">
+        No favorite passwords
+      </p>
+
+    </div>
+
+  </div>
+
+</div>

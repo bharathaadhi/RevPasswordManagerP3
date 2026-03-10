@@ -1,0 +1,31 @@
+/* ===== MAIN APP CONTAINER ===== */
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ===== BELOW NAVBAR AREA ===== */
+
+.body-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ===== SIDEBAR ===== */
+
+app-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+}
+
+/* ===== CONTENT ===== */
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 30px;
+}

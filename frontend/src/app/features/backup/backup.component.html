@@ -1,0 +1,100 @@
+<div class="backup-container">
+
+  <h2 class="page-title">📦 Vault Backup & Restore</h2>
+
+  <!-- ================= EXPORT ================= -->
+  <div class="backup-card">
+
+    <h3>🔐 Export Vault</h3>
+
+    <!-- MASTER PASSWORD -->
+    <div class="password-field">
+      <input
+        [type]="showExportPassword ? 'text' : 'password'"
+        placeholder="Master Password"
+        [(ngModel)]="exportMasterPassword"
+      />
+
+      <span class="eye" (click)="toggleExportPassword()">
+        <i class="fa"
+          [ngClass]="showExportPassword ? 'fa-eye-slash' : 'fa-eye'">
+        </i>
+      </span>
+    </div>
+
+    <!-- VERIFICATION -->
+    <div class="form-row">
+      <input
+        type="text"
+        placeholder="Verification Code"
+        [(ngModel)]="exportVerificationCode"
+      />
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="btn-group">
+      <button class="gradient-btn"
+        (click)="generateCode()">
+        Get Code
+      </button>
+
+      <button class="primary-btn"
+        (click)="exportVault()">
+        Download Backup
+      </button>
+    </div>
+
+  </div>
+
+
+  <!-- ================= IMPORT ================= -->
+  <div class="backup-card">
+
+    <h3>📥 Import Vault</h3>
+
+    <!-- MASTER PASSWORD -->
+    <div class="password-field">
+      <input
+        [type]="showImportPassword ? 'text' : 'password'"
+        placeholder="Master Password"
+        [(ngModel)]="importMasterPassword"
+      />
+
+      <span class="eye" (click)="toggleImportPassword()">
+        <i class="fa"
+          [ngClass]="showImportPassword ? 'fa-eye-slash' : 'fa-eye'">
+        </i>
+      </span>
+    </div>
+
+    <!-- VERIFICATION -->
+    <div class="form-row">
+      <input
+        type="text"
+        placeholder="Verification Code"
+        [(ngModel)]="importVerificationCode"
+      />
+    </div>
+
+    <!-- FILE -->
+    <div class="form-row">
+      <input type="file"
+        (change)="onFileSelected($event)">
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="btn-group">
+      <button class="gradient-btn"
+        (click)="generateCode()">
+        Get Code
+      </button>
+
+      <button class="primary-btn"
+        (click)="importVault()">
+        Upload Backup
+      </button>
+    </div>
+
+  </div>
+
+</div>

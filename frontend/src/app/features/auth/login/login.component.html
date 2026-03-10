@@ -1,0 +1,163 @@
+<div class="login-wrapper">
+
+  <!-- GLOBAL CYBER BACKGROUND -->
+  <div class="cyber-bg"></div>
+
+  <!-- LEFT SIDE -->
+  <div class="branding-section">
+
+    <div class="cyber-content">
+
+      <h5 class="welcome-text">WELCOME TO</h5>
+
+      <h1 class="brand-title">
+        <span class="rev-text">Rev</span>
+        PASSWORD<br>MANAGER
+      </h1>
+
+      <div class="gold-divider"></div>
+
+      <p class="security-quote">
+        Keep yourself safe <br>
+        in the digital world.
+      </p>
+
+    </div>
+
+    <div class="powered-footer">
+      Powered by <span>Revature</span>
+    </div>
+
+  </div>
+
+
+  <!-- RIGHT SIDE -->
+  <div class="form-section">
+
+    <div class="login-card">
+
+      <h2>Welcome</h2>
+      <p class="sub-text">
+        Login using your Master Credentials
+      </p>
+
+      <!-- SUCCESS MESSAGE -->
+      <div *ngIf="successMessage" class="success-msg">
+        {{ successMessage }}
+      </div>
+
+      <!-- ERROR MESSAGE -->
+      <div *ngIf="errorMessage" class="error-msg">
+        {{ errorMessage }}
+      </div>
+
+      <form (ngSubmit)="login()" autocomplete="off">
+
+        <!-- USERNAME -->
+        <div class="input-group">
+          <input type="text" placeholder="Username or Email" [(ngModel)]="usernameOrEmail" name="usernameOrEmail"
+            autocomplete="off" required />
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="input-group password-wrapper">
+
+          <input [type]="showPassword ? 'text' : 'password'" placeholder="Master Password" [(ngModel)]="password"
+            name="password" autocomplete="new-password" required />
+
+          <span class="eye-icon" (click)="togglePassword()">
+            <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'">
+            </i>
+          </span>
+
+        </div>
+
+        <!-- FORGOT PASSWORD -->
+        <div class="forgot-link">
+          <a routerLink="/forgot-password" class="link-text">
+            Forgot Master Password?
+          </a>
+        </div>
+
+        <!-- LOGIN BUTTON -->
+        <button type="submit" class="login-button" [disabled]="loading">
+
+          <span *ngIf="!loading">Login</span>
+          <span *ngIf="loading">Logging in...</span>
+
+        </button>
+
+        <!-- REGISTER LINK -->
+        <div class="register-link">
+          Don't have an account?
+          <a routerLink="/register" class="link-text">
+            Create Account
+          </a>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================= PREMIUM 2FA MODAL ================= -->
+
+<div class="otp-backdrop" *ngIf="showOtpModal">
+
+  <div class="otp-modal-container">
+    
+    <!-- CYBER DECORATION -->
+    <div class="modal-glow"></div>
+    <div class="corner-accents top-left"></div>
+    <div class="corner-accents bottom-right"></div>
+
+    <div class="modal-inner">
+      
+      <div class="modal-header">
+        <div class="icon-circle">
+          <i class="fa fa-shield"></i>
+        </div>
+        <h2>Identity Verification</h2>
+        <p class="header-subtext">A 6-digit code was sent to your registered email.</p>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- MODAL ERROR MESSAGE -->
+        <div *ngIf="errorMessage" class="error-msg-premium">
+          <i class="fa fa-exclamation-triangle"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <div class="input-container-premium">
+          <label>ENTER VERIFICATION CODE</label>
+          <div class="otp-input-wrapper">
+            <input type="text" [(ngModel)]="enteredOtp" placeholder="0 0 0 0 0 0" 
+              maxlength="6" [disabled]="verifyLoading" />
+            <div class="input-glow"></div>
+          </div>
+        </div>
+
+        <button (click)="verifyOtp()" class="verify-btn-premium" [disabled]="verifyLoading">
+          <span *ngIf="!verifyLoading">
+            <i class="fa fa-unlock-alt"></i> VERIFY & PROCEED
+          </span>
+          <span *ngIf="verifyLoading" class="loader-container">
+            <span class="cyber-loader"></span> Verifying...
+          </span>
+        </button>
+
+        <div class="modal-footer">
+          <p>Didn't receive the code? <a (click)="api.generateVerificationCode(otpEmail).subscribe()">Resend</a></p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

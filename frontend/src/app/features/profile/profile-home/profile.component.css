@@ -1,0 +1,316 @@
+/* ================= CONTAINER ================= */
+
+.profile-container {
+  padding: 40px;
+  max-width: 750px;
+  margin: auto;
+}
+
+.title {
+  margin-bottom: 25px;
+  font-size: 22px;
+}
+
+/* ================= TABS ================= */
+
+.tabs {
+  position: relative;
+  display: flex;
+  background: #020617;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 25px;
+}
+
+.tab-indicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 33.33%;
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+  border-radius: 14px;
+  transition: 0.4s cubic-bezier(.68, -0.55, .27, 1.55);
+}
+
+.tabs button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 12px;
+  color: #94a3b8;
+  cursor: pointer;
+  z-index: 2;
+  font-weight: 500;
+}
+
+.tabs button.active {
+  color: white;
+}
+
+/* ================= PREMIUM CARD ================= */
+
+.premium-card {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  padding: 28px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  animation: fadeIn .4s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= INPUT ================= */
+
+input {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: #020617;
+  color: white;
+  transition: .3s;
+}
+
+input:focus {
+  outline: none;
+  border: 1px solid #6366f1;
+  box-shadow: 0 0 12px rgba(99, 102, 241, .6);
+}
+
+/* ================= BUTTON ================= */
+
+.btn {
+  margin-top: 15px;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: .3s;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, .4);
+}
+
+/* ================= PASSWORD INPUT ================= */
+
+.password-group {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.password-group input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.eye {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  opacity: .7;
+}
+
+/* ================= SECURITY QUESTIONS ================= */
+
+.question-box {
+  margin-bottom: 15px;
+}
+
+.question {
+  width: 100%;
+  margin-bottom: 6px;
+  background: #060b1f;
+}
+
+.answer {
+  width: 100%;
+}
+
+/* ================= TWO FACTOR AUTH CARD ================= */
+
+.twofa-card {
+  background: rgba(15, 23, 42, 0.9);
+  padding: 22px;
+  border-radius: 16px;
+  margin-top: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+.twofa-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.enabled {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.disabled {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* ================= MODERN TOGGLE SWITCH ================= */
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 56px;
+  height: 30px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: #334155;
+  border-radius: 34px;
+  transition: .4s;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  height: 24px;
+  width: 24px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: .4s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
+}
+
+.switch input:checked+.slider {
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+}
+
+.switch input:checked+.slider:before {
+  transform: translateX(26px);
+}
+
+.switch:hover .slider {
+  box-shadow: 0 0 12px rgba(99, 102, 241, .6);
+}
+
+/* ================= SECURITY OVERVIEW ================= */
+
+.security-grid {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.security-box {
+  flex: 1;
+  padding: 18px;
+  border-radius: 16px;
+  background: linear-gradient(145deg,
+      rgba(99, 102, 241, 0.08),
+      rgba(15, 23, 42, 0.4));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  text-align: center;
+  transition: .3s;
+}
+
+.security-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(99, 102, 241, .25);
+}
+
+/* ================= SECURITY SCORE ================= */
+
+.score-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.progress-ring {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    conic-gradient(#6366f1 calc(var(--score)*1%),
+      rgba(255, 255, 255, 0.05) 0);
+
+  box-shadow:
+    0 0 20px rgba(99, 102, 241, .5),
+    inset 0 0 25px rgba(99, 102, 241, .15);
+
+  animation: cyberGlow 3s ease-in-out infinite alternate;
+}
+
+.progress-inner {
+  width: 155px;
+  height: 155px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, .95);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, .6);
+}
+
+.progress-inner h2 {
+  font-size: 34px;
+  margin: 0;
+}
+
+.progress-inner span {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-top: 5px;
+}
+
+@keyframes cyberGlow {
+  from {
+    box-shadow:
+      0 0 15px rgba(99, 102, 241, .4),
+      inset 0 0 20px rgba(99, 102, 241, .2);
+  }
+
+  to {
+    box-shadow:
+      0 0 40px rgba(168, 85, 247, .9),
+      inset 0 0 40px rgba(168, 85, 247, .4);
+  }
+}
