@@ -30,8 +30,6 @@ export class BackupComponent {
 
   // ================= GENERATE CODE =================
 
-  // ================= GENERATE CODE =================
-
   generateCode() {
     this.api.generateVaultCode()
       .subscribe((code: string) => {

@@ -33,7 +33,7 @@ public class NotificationService {
         // Optionally try sending email if we wanted to
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("revpasswordmanager@gmail.com");
+            message.setFrom("bharathaadhi32@gmail.com");
             message.setTo(request.getRecipientEmail());
             message.setSubject(request.getTitle());
             message.setText(request.getMessage());
