@@ -50,8 +50,8 @@ public class VaultController {
     }
 
     @PutMapping("/favorite/{id}")
-    public VaultEntry favorite(@PathVariable Long id) {
-        return vaultService.markFavorite(id);
+    public VaultEntry favorite(@PathVariable Long id, @RequestParam boolean value) {
+        return vaultService.markFavorite(id, value);
     }
     @PostMapping("/reveal/{id}")
     public String reveal(@PathVariable Long id, @RequestBody MasterPasswordDto dto) {

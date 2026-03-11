@@ -129,6 +129,9 @@ input:focus {
   transform: translateY(-50%);
   cursor: pointer;
   opacity: .7;
+  z-index: 10;
+  pointer-events: auto; /* FIX CLICK TARGET */
+  padding: 5px;
 }
 
 /* ================= SECURITY QUESTIONS ================= */

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { finalize, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -30,6 +31,7 @@ export class ProfileHomeComponent implements OnInit {
   showNew = false;
   showConfirm = false;
   twoFactorEnabled = false;
+  isSaving = false; // Add for button feedback
 
   securityQuestions: any[] = [];
   answers: string[] = ['', '', ''];
@@ -89,7 +91,10 @@ export class ProfileHomeComponent implements OnInit {
       phone: this.phone
     };
 
+    this.isSaving = true;
+
     this.api.updateProfile(payload)
+      .pipe(finalize(() => this.isSaving = false))
       .subscribe({
 
         next: (res: any) => {
@@ -186,7 +191,10 @@ export class ProfileHomeComponent implements OnInit {
         }))
     };
 
+    this.isSaving = true;
+
     this.api.updateSecurityAnswers(payload)
+      .pipe(finalize(() => this.isSaving = false))
       .subscribe(() => {
         alert("Answers updated successfully");
       });
@@ -214,7 +222,10 @@ export class ProfileHomeComponent implements OnInit {
       newPassword: this.newMasterPassword
     };
 
+    this.isSaving = true;
+
     this.api.updateMasterPassword(payload)
+      .pipe(finalize(() => this.isSaving = false))
       .subscribe({
 
         next: () => {

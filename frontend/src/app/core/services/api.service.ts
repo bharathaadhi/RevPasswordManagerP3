@@ -147,7 +147,7 @@ export class ApiService {
   }
 
   favoriteVaultEntry(id: number, value: boolean) {
-    return this.http.put(`${this.BASE_URL}/vault/favorite/${id}`, {});
+    return this.http.put(`${this.BASE_URL}/vault/favorite/${id}?value=${value}`, {});
   }
 
   viewPassword(payload: any) {

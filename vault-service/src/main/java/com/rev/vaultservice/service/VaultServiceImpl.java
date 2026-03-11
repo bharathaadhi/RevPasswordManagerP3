@@ -10,6 +10,7 @@ import com.rev.vaultservice.service.VaultService;
 import com.rev.vaultservice.client.NotificationClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ public class VaultServiceImpl implements VaultService {
     private final NotificationClient notificationClient;
     private String generatedCode;
     @Override
+    @Transactional
     public VaultEntry saveVault(VaultRequestDto dto) {
 
         if (vaultRepository.existsByUserIdAndPlatformAndUsername(dto.getUserId(), dto.getPlatform(), dto.getUsername())) {
@@ -59,6 +61,7 @@ public class VaultServiceImpl implements VaultService {
     }
 
     @Override
+    @Transactional
     public void deleteVault(Long id) {
         vaultRepository.deleteById(id);
     }
@@ -69,9 +72,10 @@ public class VaultServiceImpl implements VaultService {
     }
 
     @Override
-    public VaultEntry markFavorite(Long id) {
+    @Transactional
+    public VaultEntry markFavorite(Long id, boolean favorite) {
         VaultEntry vault = vaultRepository.findById(id).orElseThrow();
-        vault.setFavorite(true);
+        vault.setFavorite(favorite);
         return vaultRepository.save(vault);
     }
     @Override
@@ -100,6 +104,7 @@ public class VaultServiceImpl implements VaultService {
         return generatedCode;
     }
     @Override
+    @Transactional
     public void deleteVaultWithCode(Long id, String code, String masterPassword, String email) {
 
         if (!authFeignClient.verifyMasterPassword(new MasterPasswordDto(masterPassword, email))) {
@@ -125,6 +130,7 @@ public class VaultServiceImpl implements VaultService {
         } catch (Exception e) {}
     }
     @Override
+    @Transactional
     public VaultEntry updateVault(Long id, VaultRequestDto dto) {
 
         VaultEntry vault = vaultRepository.findById(id).orElseThrow();
@@ -153,6 +159,7 @@ public class VaultServiceImpl implements VaultService {
     }
 
     @Override
+    @Transactional
     public void importVaultSecure(BackupRequestDto dto) {
         verifyCredentials(dto);
 

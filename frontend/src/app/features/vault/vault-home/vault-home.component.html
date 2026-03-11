@@ -105,9 +105,14 @@
           <p class="website">{{ p.website }}</p>
         </div>
 
-        <span class="favorite" [class.active]="p.favorite" (click)="toggleFavorite(p)">
-          ⭐
-        </span>
+        <button type="button" 
+                class="favorite-btn" 
+                [class.active]="p.favorite" 
+                [class.loading]="togglingIds.has(p.id)"
+                (click)="toggleFavorite(p); $event.stopPropagation()">
+          <span *ngIf="!togglingIds.has(p.id)">⭐</span>
+          <span *ngIf="togglingIds.has(p.id)" class="mini-loader"></span>
+        </button>
 
       </div>
 
@@ -181,8 +186,8 @@
     <!-- ACTION BUTTONS -->
     <div style="display:flex; gap:10px; margin-top:10px;">
 
-      <button type="button" class="primary-btn" (click)="savePassword()">
-        Save
+      <button type="button" class="primary-btn" [disabled]="isVerifying" (click)="savePassword()">
+        {{ isVerifying ? 'Saving...' : 'Save' }}
       </button>
 
       <button type="button" class="secondary-btn" (click)="closeAdd()">
@@ -276,8 +281,8 @@
 
     <div style="display:flex; gap:10px; margin-top:10px;">
 
-      <button type="button" class="primary-btn" (click)="updatePassword()">
-        Update
+      <button type="button" class="primary-btn" [disabled]="isVerifying" (click)="updatePassword()">
+        {{ isVerifying ? 'Updating...' : 'Update' }}
       </button>
 
       <button type="button" class="secondary-btn" (click)="showEditModal = false">
@@ -328,8 +333,8 @@
     <!-- ACTION BUTTONS -->
     <div class="modal-actions">
 
-      <button class="danger-btn" (click)="confirmDelete()">
-        Confirm Delete
+      <button class="danger-btn" [disabled]="isVerifying" (click)="confirmDelete()">
+        {{ isVerifying ? 'Deleting...' : 'Confirm Delete' }}
       </button>
 
       <button class="secondary-btn" (click)="showDeleteModal=false">

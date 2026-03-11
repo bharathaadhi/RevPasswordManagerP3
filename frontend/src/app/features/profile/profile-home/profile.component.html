@@ -37,8 +37,8 @@
       <label>Phone</label>
       <input [(ngModel)]="phone">
 
-      <button class="btn" (click)="saveProfile()">
-        Save Changes
+      <button class="btn" [disabled]="isSaving" (click)="saveProfile()">
+        {{ isSaving ? 'Saving...' : 'Save Changes' }}
       </button>
 
     </div>
@@ -80,8 +80,8 @@
         Strength: {{passwordStrength}}
       </p>
 
-      <button class="btn" (click)="updateMasterPassword()">
-        Update Password
+      <button class="btn" [disabled]="isSaving" (click)="updateMasterPassword()">
+        {{ isSaving ? 'Updating...' : 'Update Password' }}
       </button>
 
       <!-- ================= 2FA Enable / Disable ================= -->
@@ -119,8 +119,8 @@
         <input class="answer" [(ngModel)]="answers[i]" placeholder="Update Answer">
       </div>
 
-      <button class="btn" (click)="updateAnswers()">
-        Update Answers
+      <button class="btn" [disabled]="isSaving" (click)="updateAnswers()">
+        {{ isSaving ? 'Updating...' : 'Update Answers' }}
       </button>
 
     </div>

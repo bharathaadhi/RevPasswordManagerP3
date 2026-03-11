@@ -31,11 +31,11 @@ body {
   box-shadow:
     0 10px 40px rgba(0,0,0,0.4),
     inset 0 1px 0 rgba(255,255,255,0.03);
-  transition: all 0.3s ease;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card:hover {
-  transform: translateY(-6px) scale(1.01);
+  transform: translateY(-3px);
 }
 
 /* ================= BUTTONS ================= */
@@ -51,8 +51,13 @@ body {
 }
 
 .btn:hover {
-  transform: scale(1.07);
+  transform: scale(1.04);
   box-shadow: 0 0 18px rgba(147,51,234,0.5);
+}
+
+.btn:active {
+  transform: scale(0.96);
+  opacity: 0.9;
 }
 
 .btn-danger {

@@ -19,7 +19,7 @@ public interface VaultService {
     List<VaultEntry> searchByPlatform(String platform);
     String revealPassword(Long id);
     String generateCode();
-    VaultEntry markFavorite(Long id);
+    VaultEntry markFavorite(Long id, boolean favorite);
     List<VaultEntry> getByCategory(String category);
     List<VaultEntry> sortByPlatform();
 

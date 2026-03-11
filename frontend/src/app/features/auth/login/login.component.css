@@ -153,6 +153,9 @@ form {
   transform: translateY(-50%);
   opacity: .7;
   cursor: pointer;
+  z-index: 10;
+  pointer-events: auto; /* ENSURE CLICKABLE */
+  padding: 5px;
 }
 
 /* ================= LINKS ================= */

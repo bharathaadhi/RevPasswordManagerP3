@@ -5,11 +5,26 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 public interface VaultRepository extends JpaRepository<VaultEntry, Long> {
+    
+    @Query("SELECT v FROM VaultEntry v WHERE v.favorite = true")
     List<VaultEntry> findByFavoriteTrue();
-    List<VaultEntry> findByUserId(Long userId);
-    boolean existsByUserIdAndPlatformAndUsername(Long userId, String platform, String username);
-    List<VaultEntry> findByPlatformContaining(String platform);
-    List<VaultEntry> findByCategory(String category);
+    
+    @Query("SELECT v FROM VaultEntry v WHERE v.userId = :userId")
+    List<VaultEntry> findByUserId(@Param("userId") Long userId);
+    
+    @Query("SELECT CASE WHEN COUNT(v) > 0 THEN true ELSE false END FROM VaultEntry v WHERE v.userId = :userId AND v.platform = :platform AND v.username = :username")
+    boolean existsByUserIdAndPlatformAndUsername(@Param("userId") Long userId, @Param("platform") String platform, @Param("username") String username);
+    
+    @Query("SELECT v FROM VaultEntry v WHERE v.platform LIKE %:platform%")
+    List<VaultEntry> findByPlatformContaining(@Param("platform") String platform);
+    
+    @Query("SELECT v FROM VaultEntry v WHERE v.category = :category")
+    List<VaultEntry> findByCategory(@Param("category") String category);
+    
+    @Query("SELECT v FROM VaultEntry v ORDER BY v.platform ASC")
     List<VaultEntry> findAllByOrderByPlatformAsc();
 }

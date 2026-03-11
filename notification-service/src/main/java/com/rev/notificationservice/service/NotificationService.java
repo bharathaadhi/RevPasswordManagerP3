@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -18,6 +19,7 @@ public class NotificationService {
     private final JavaMailSender mailSender;
     private final NotificationRepository notificationRepository;
 
+    @Transactional
     public void sendAndSaveNotification(NotificationRequest request) {
         log.info("Saving in-app notification for {}: {}", request.getRecipientEmail(), request.getMessage());
         
@@ -51,6 +53,7 @@ public class NotificationService {
         return notificationRepository.findByRecipientEmailAndIsReadFalse(email);
     }
 
+    @Transactional
     public void markAsRead(Long id) {
         notificationRepository.findById(id).ifPresent(notification -> {
             notification.setRead(true);

@@ -59,6 +59,10 @@ export class VaultHomeComponent implements OnInit {
   deleteVerificationCode = '';
   deleteError = '';
 
+  /* TRACKING FAVORITE UPDATE STATE */
+  togglingIds: Set<number> = new Set();
+  filterMode: 'all' | 'favorites' | 'weak' | 'search' | 'category' = 'all';
+
   searchKeyword = '';
   passwordStrength = '';
 
@@ -157,6 +161,8 @@ export class VaultHomeComponent implements OnInit {
     const user = localStorage.getItem('username');
     if (!user) return;
 
+    this.filterMode = 'all';
+
     this.api.getVault().subscribe({
       next: (res: any[]) => {
         this.allPasswords = [...res];
@@ -199,6 +205,7 @@ export class VaultHomeComponent implements OnInit {
   onCategoryChange(event: Event) {
 
     const category = (event.target as HTMLSelectElement).value;
+    this.filterMode = category === 'ALL' ? 'all' : 'category';
 
     if (category === 'ALL') {
 
@@ -249,6 +256,7 @@ export class VaultHomeComponent implements OnInit {
   /* ================= SEARCH ================= */
 
   search() {
+    this.filterMode = 'search';
 
     if (!this.searchKeyword) {
 
@@ -270,14 +278,23 @@ export class VaultHomeComponent implements OnInit {
   /* ================= FAVORITES ================= */
 
   loadFavorites() {
-
-    this.passwords = this.allPasswords.filter(p => p.favorite);
-
+    this.filterMode = 'favorites';
+    if (this.allPasswords.length > 0) {
+      this.passwords = this.allPasswords.filter(p => p.favorite);
+      this.cd.detectChanges();
+    } else {
+      this.api.getVault().subscribe(res => {
+        this.allPasswords = [...res];
+        this.passwords = this.allPasswords.filter(p => p.favorite);
+        this.cd.detectChanges();
+      });
+    }
   }
 
   /* ================= WEAK PASSWORDS ================= */
 
   loadWeakPasswords(user: string) {
+    this.filterMode = 'weak';
     if (this.allPasswords.length > 0) {
       this.passwords = this.allPasswords.filter(p => p.strength === 'Weak');
       this.cd.detectChanges();
@@ -339,10 +356,13 @@ export class VaultHomeComponent implements OnInit {
       calculatedStrength = 'Strong';
     }
 
+    this.isVerifying = true;
+
     this.api.addVaultEntry({
       ...this.newPassword,
       strength: calculatedStrength
-    }).subscribe({
+    }).pipe(finalize(() => this.isVerifying = false))
+      .subscribe({
 
       next: () => {
 
@@ -398,11 +418,14 @@ export class VaultHomeComponent implements OnInit {
     const user = localStorage.getItem('username');
     if (!user || !this.deleteEntryId) return;
 
+    this.isVerifying = true; // STARTS VERIFICATION
+
     this.api.secureDeletePassword({
       entryId: this.deleteEntryId,
       code: this.deleteVerificationCode,
       masterPassword: this.deleteMasterPassword
-    }).subscribe({
+    }).pipe(finalize(() => this.isVerifying = false))
+      .subscribe({
 
       next: () => {
 
@@ -474,7 +497,7 @@ export class VaultHomeComponent implements OnInit {
 
     }
 
-    this.isVerifying = false;
+    this.isVerifying = true; // FIX: Set to true BEFORE request
 
     this.api.revealPassword(this.selectedEntryId, this.masterPasswordInput)
       .pipe(finalize(() => this.isVerifying = false))
@@ -555,10 +578,13 @@ This code expires in 5 minutes.
       calculatedStrength = originalEntry?.strength || 'Weak';
     }
 
+    this.isVerifying = true;
+
     this.api.updateVaultEntry(this.editingId, {
       ...this.editPassword,
       strength: calculatedStrength
-    }).subscribe({
+    }).pipe(finalize(() => this.isVerifying = false))
+      .subscribe({
 
       next: () => {
 
@@ -615,45 +641,60 @@ This code expires in 5 minutes.
 
   toggleFavorite(p: any) {
 
-  const newValue = !p.favorite;
-  this.api.favoriteVaultEntry(p.id, newValue)
-    .subscribe({
+    if (this.togglingIds.has(p.id)) return; // PREVENT DOUBLE CLICK
 
-      next: () => {
+    const newValue = !p.favorite;
+    this.togglingIds.add(p.id);
 
-        /* update master list */
-        const index = this.allPasswords.findIndex(x => x.id === p.id);
+    this.api.favoriteVaultEntry(p.id, newValue)
+      .pipe(finalize(() => {
+        this.togglingIds.delete(p.id);
+        this.cd.detectChanges();
+      }))
+      .subscribe({
 
-        if (index !== -1) {
-          this.allPasswords[index].favorite = newValue;
+        next: () => {
+
+          /* update master list */
+          const index = this.allPasswords.findIndex(x => x.id === p.id);
+          if (index !== -1) {
+            this.allPasswords[index].favorite = newValue;
+          }
+
+          /* update local entry in view list (prevents jumping) */
+          const viewIndex = this.passwords.findIndex(x => x.id === p.id);
+          if (viewIndex !== -1) {
+            if (this.filterMode === 'favorites' && !newValue) {
+              // Remove if unfavorited while in favorites view
+              this.passwords.splice(viewIndex, 1);
+            } else {
+              this.passwords[viewIndex].favorite = newValue;
+            }
+          }
+
+          /* update favorite count */
+          this.favoriteCount =
+            this.allPasswords.filter(x => x.favorite).length;
+
+          this.showToast(
+            newValue ? "Added to favorites" : "Removed from favorites",
+            "toast-success"
+          );
+
+        },
+
+        error: () => {
+
+          this.showToast(
+            "Favorite update failed",
+            "toast-error"
+          );
+
         }
 
-        /* refresh UI list */
-        this.passwords = [...this.allPasswords];
+      });
 
-        /* update favorite count */
-        this.favoriteCount =
-          this.allPasswords.filter(x => x.favorite).length;
-
-        this.showToast(
-          "Favorite updated",
-          "toast-success"
-        );
-
-      },
-
-      error: () => {
-
-        this.showToast(
-          "Favorite update failed",
-          "toast-error"
-        );
-
-      }
-
-    });
-
-}
+  }
 
   toggleDeletePassword() {
     this.showDeletePassword = !this.showDeletePassword;

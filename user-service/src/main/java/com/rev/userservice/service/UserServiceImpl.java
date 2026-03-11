@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService {
     private NotificationClient notificationClient;
 
     @Override
+    @Transactional
     public User register(RegisterRequest request) {
         // Check if user already exists
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -110,6 +112,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public String recoverAccount(ForgotPasswordDto request) {
         String identifier = request.getUsernameOrEmail();
         Optional<User> userOpt = userRepository.findFirstByEmail(identifier);
@@ -150,6 +153,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public String resetPassword(ResetPasswordRequest request) {
         User user = userRepository.findFirstByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -210,6 +214,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User updateProfile(String email, RegisterRequest request) {
         User user = userRepository.findFirstByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -249,6 +254,7 @@ public class UserServiceImpl implements UserService {
         return newToken;
     }
     @Override
+    @Transactional
     public String updateMasterPassword(UpdateMasterPasswordRequest request) {
         String identifier = request.getUsernameOrEmail();
         Optional<User> userOpt = userRepository.findFirstByEmail(identifier);
