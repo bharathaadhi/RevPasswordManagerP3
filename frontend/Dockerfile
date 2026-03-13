@@ -12,6 +12,7 @@ RUN npm run build -- --configuration production
 
 # Stage 2: Serve the application using Nginx
 FROM nginx:alpine
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist/rev-password-manager-ui/browser /usr/share/nginx/html
 # If your build output directory is different, please adjust the path above.
 # Usually for Angular 17+, it's dist/<project-name>/browser
