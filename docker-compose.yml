@@ -5,78 +5,202 @@ services:
     build: ./eureka-server
     ports:
       - "8761:8761"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   config-server:
     build: ./config-server
     ports:
       - "8888:8888"
     depends_on:
-      - eureka-server
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   api-gateway:
     build: ./api-gateway
     ports:
       - "8080:8080"
     depends_on:
-      - eureka-server
-      - config-server
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
 
   user-service:
     build: ./user-service
     ports:
       - "8081:8081"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://user-db:3306/userdb
+      - SPRING_DATASOURCE_URL=jdbc:mysql://user-db:3306/user_service_db
+      - DB_PASSWORD=Aadhi@2002
     depends_on:
-      - user-db
-      - eureka-server
+      user-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
 
   vault-service:
     build: ./vault-service
     ports:
       - "8082:8082"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://vault-db:3306/vaultdb
+      - SPRING_DATASOURCE_URL=jdbc:mysql://vault-db:3306/vault_service_db
+      - DB_PASSWORD=Aadhi@2002
     depends_on:
-      - vault-db
-      - eureka-server
+      vault-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
 
   generator-service:
     build: ./generator-service
     ports:
       - "8083:8083"
     depends_on:
-      - eureka-server
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
 
   security-service:
     build: ./security-service
     ports:
       - "8084:8084"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://security-db:3306/security_service_db
+      - DB_PASSWORD=Aadhi@2002
     depends_on:
-      - eureka-server
+      security-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
 
   notification-service:
     build: ./notification-service
     ports:
       - "8085:8085"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://notification-db:3306/rev_notifications
+      - DB_PASSWORD=Aadhi@2002
+      - MAIL_PASSWORD=ywhhsmfgphbbbxij
     depends_on:
-      - eureka-server
+      notification-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  frontend:
+    build: ./FrontEnd
+    ports:
+      - "4200:80"
+    depends_on:
+      api-gateway:
+        condition: service_started
 
   user-db:
     image: mysql:8.0
     environment:
-      - MYSQL_DATABASE=userdb
-      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=user_service_db
+      - MYSQL_ROOT_PASSWORD=Aadhi@2002
     ports:
       - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
 
   vault-db:
     image: mysql:8.0
     environment:
-      - MYSQL_DATABASE=vaultdb
-      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=vault_service_db
+      - MYSQL_ROOT_PASSWORD=Aadhi@2002
     ports:
       - "3308:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  security-db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_DATABASE=security_service_db
+      - MYSQL_ROOT_PASSWORD=Aadhi@2002
+    ports:
+      - "3309:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  notification-db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_DATABASE=rev_notifications
+      - MYSQL_ROOT_PASSWORD=Aadhi@2002
+    ports:
+      - "3310:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  sonarqube-db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonarqube
+    volumes:
+      - sonarqube_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sonarqube:
+    image: sonarqube:lts
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://sonarqube-db:5432/sonarqube
+      - SONAR_JDBC_USERNAME=sonar
+      - SONAR_JDBC_PASSWORD=sonar
+    depends_on:
+      sonarqube-db:
+        condition: service_healthy
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/api/system/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+
+volumes:
+  sonarqube_db_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
 
 networks:
   default:
