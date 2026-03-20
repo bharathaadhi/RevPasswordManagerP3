@@ -45,8 +45,8 @@ public class VaultController {
     }
 
     @GetMapping("/search")
-    public List<VaultEntry> search(@RequestParam String platform) {
-        return vaultService.searchByPlatform(platform);
+    public List<VaultEntry> search(@RequestParam String platform, @RequestParam Long userId) {
+        return vaultService.searchByPlatform(platform, userId);
     }
 
     @PutMapping("/favorite/{id}")
@@ -54,16 +54,21 @@ public class VaultController {
         return vaultService.markFavorite(id, value);
     }
     @PostMapping("/reveal/{id}")
-    public String reveal(@PathVariable Long id, @RequestBody MasterPasswordDto dto) {
-        return vaultService.revealPassword(id, dto.getMasterPassword(), dto.getEmail());
+    public org.springframework.http.ResponseEntity<?> reveal(@PathVariable Long id, @RequestBody MasterPasswordDto dto) {
+        try {
+            String password = vaultService.revealPassword(id, dto.getMasterPassword(), dto.getEmail(), dto.getCode());
+            return org.springframework.http.ResponseEntity.ok(password);
+        } catch (RuntimeException e) {
+            return org.springframework.http.ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
     @GetMapping("/category/{category}")
-    public List<VaultEntry> getByCategory(@PathVariable String category) {
-        return vaultService.getByCategory(category);
+    public List<VaultEntry> getByCategory(@PathVariable String category, @RequestParam Long userId) {
+        return vaultService.getByCategory(category, userId);
     }
     @GetMapping("/generate-code")
-    public String generateCode() {
-        return vaultService.generateCode();
+    public String generateCode(@RequestParam String email) {
+        return vaultService.generateCode(email);
     }
     @PostMapping("/delete-secure/{id}")
     public org.springframework.http.ResponseEntity<?> secureDelete(@PathVariable Long id, @RequestBody VerificationCodeDto dto) {
@@ -84,12 +89,12 @@ public class VaultController {
         }
     }
     @GetMapping("/favorites")
-    public List<VaultEntry> favorites() {
-        return vaultService.getFavorites();
+    public List<VaultEntry> favorites(@RequestParam Long userId) {
+        return vaultService.getFavorites(userId);
     }
     @GetMapping("/sort")
-    public List<VaultEntry> sort() {
-        return vaultService.sortByPlatform();
+    public List<VaultEntry> sort(@RequestParam Long userId) {
+        return vaultService.sortByPlatform(userId);
     }
 
     @PostMapping("/export-secure")

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { EmailSimulatorService } from './email-simulator.service';
 
@@ -10,8 +10,23 @@ export class ApiService {
 
   constructor(private http: HttpClient, private emailSim: EmailSimulatorService) { }
 
-  private getLoggedUser(): string {
-    return localStorage.getItem('username') || localStorage.getItem('email') || '';
+  public getLoggedUser(): string {
+    const email = localStorage.getItem('email');
+    const username = localStorage.getItem('username');
+    if (email && email !== 'null' && email !== 'undefined') return email.toLowerCase().trim();
+    if (username && username !== 'null' && username !== 'undefined') return username.trim();
+    return '';
+  }
+
+  private getLoggedEmail(): string {
+    const email = localStorage.getItem('email');
+    return (email && email !== 'null' && email !== 'undefined') ? email : '';
+  }
+
+  public getUserId(): number | null {
+    const id = localStorage.getItem('userId');
+    if (!id || id === 'null' || id === 'undefined') return null;
+    return Number(id);
   }
 
   // ================= AUTH =================
@@ -25,7 +40,8 @@ export class ApiService {
 
   logout() {
     const email = this.getLoggedUser();
-    return this.http.post(`${this.BASE_URL}/api/auth/logout?email=${email}`, {});
+    const params = new HttpParams().set('email', email);
+    return this.http.post(`${this.BASE_URL}/api/auth/logout`, {}, { params });
   }
 
   updateProfile(data: any) {
@@ -33,12 +49,14 @@ export class ApiService {
   }
 
   getProfile(usernameOrEmail: string) {
-    return this.http.get(`${this.BASE_URL}/api/auth/profile?usernameOrEmail=${usernameOrEmail}`);
+    const params = new HttpParams().set('usernameOrEmail', usernameOrEmail);
+    return this.http.get(`${this.BASE_URL}/api/auth/profile`, { params });
   }
 
   // ================= 2FA =================
   generate2FA(email: string) {
-    return this.http.post(`${this.BASE_URL}/api/auth/generate-2fa?email=${email}`, {}, { responseType: 'text' })
+    const params = new HttpParams().set('email', email);
+    return this.http.post(`${this.BASE_URL}/api/auth/generate-2fa`, {}, { params, responseType: 'text' })
       .pipe(tap(res => {
         const code = res.includes(': ') ? res.split(': ').pop() : res;
         this.emailSim.showEmail(email, (code || '').trim());
@@ -46,7 +64,8 @@ export class ApiService {
   }
 
   generateVerificationCode(usernameOrEmail: string) {
-    return this.http.post(`${this.BASE_URL}/api/auth/generate-2fa?email=${usernameOrEmail}`, {}, { responseType: 'text' })
+    const params = new HttpParams().set('email', usernameOrEmail);
+    return this.http.post(`${this.BASE_URL}/api/auth/generate-2fa`, {}, { params, responseType: 'text' })
       .pipe(tap(res => {
         const code = res.includes(': ') ? res.split(': ').pop() : res;
         this.emailSim.showEmail(usernameOrEmail, (code || '').trim());
@@ -66,7 +85,8 @@ export class ApiService {
   }
 
   get2FAStatus(usernameOrEmail: string) {
-    return this.http.get(`${this.BASE_URL}/api/auth/2fa-status?usernameOrEmail=${usernameOrEmail}`);
+    const params = new HttpParams().set('usernameOrEmail', usernameOrEmail);
+    return this.http.get(`${this.BASE_URL}/api/auth/2fa-status`, { params });
   }
 
   toggle2FA(usernameOrEmail: string, enabled: boolean) {
@@ -75,9 +95,15 @@ export class ApiService {
     });
   }
 
+  showSimulatedNotification(to: string, title: string, message: string) {
+    this.emailSim.showNotification(to, title, message);
+  }
+
   // ================= SECURITY QUESTIONS =================
   getSecurityQuestions(usernameOrEmail: string): Observable<string[]> {
-    return this.http.get<string[]>(`${this.BASE_URL}/api/auth/security-questions/${usernameOrEmail}`);
+    const normalized = usernameOrEmail ? usernameOrEmail.toLowerCase().trim() : '';
+    const params = new HttpParams().set('usernameOrEmail', normalized);
+    return this.http.get<string[]>(`${this.BASE_URL}/api/auth/security-questions`, { params });
   }
 
   saveSecurityQuestion(data: any) {
@@ -85,7 +111,7 @@ export class ApiService {
   }
 
   updateSecurityAnswers(payload: any) {
-    return this.http.post(`${this.BASE_URL}/api/auth/security-question`, payload, { responseType: 'text' });
+    return this.http.post(`${this.BASE_URL}/api/auth/security-question`, payload);
   }
 
   forgotPassword(data: any): Observable<any> {
@@ -99,12 +125,13 @@ export class ApiService {
   // ================= DASHBOARD =================
   dashboard() {
     const user = this.getLoggedUser();
-    return this.http.get(`${this.BASE_URL}/api/auth/profile?usernameOrEmail=${user}`);
+    const params = new HttpParams().set('usernameOrEmail', user);
+    return this.http.get(`${this.BASE_URL}/api/auth/profile`, { params });
   }
 
   // ================= VAULT =================
   getVault() {
-    const userId = localStorage.getItem('userId');
+    const userId = this.getUserId();
     if (userId) {
       return this.http.get<any[]>(`${this.BASE_URL}/vault/user/${userId}`);
     }
@@ -117,7 +144,7 @@ export class ApiService {
 
   addVaultEntry(data: any) {
     const payload = {
-      userId: localStorage.getItem('userId'),
+      userId: this.getUserId(),
       platform: data.platform || data.accountName,
       username: data.username,
       encryptedPassword: data.encryptedPassword || data.password,
@@ -133,7 +160,7 @@ export class ApiService {
   }
 
   secureDeletePassword(payload: any) {
-    const email = localStorage.getItem('username');
+    const email = this.getLoggedUser();
     const masterPassword = payload.masterPassword;
     return this.http.post(`${this.BASE_URL}/vault/delete-secure/${payload.entryId}`, {
       code: payload.code,
@@ -154,9 +181,9 @@ export class ApiService {
     return this.http.post<any>(`${this.BASE_URL}/vault/reveal/${payload.entryId}`, { masterPassword: payload.masterPassword });
   }
 
-  revealPassword(id: number | null, masterPassword?: string) {
-    const email = localStorage.getItem('username');
-    return this.http.post(`${this.BASE_URL}/vault/reveal/${id}`, { masterPassword, email }, { responseType: 'text' });
+  revealPassword(id: number | null, masterPassword?: string, code?: string) {
+    const email = this.getLoggedUser();
+    return this.http.post(`${this.BASE_URL}/vault/reveal/${id}`, { masterPassword, email, code }, { responseType: 'text' });
   }
 
   updatePassword(id: number, payload: any) {
@@ -165,7 +192,7 @@ export class ApiService {
 
   updateVaultEntry(id: number, data: any) {
     const payload = {
-      userId: localStorage.getItem('userId'),
+      userId: this.getUserId(),
       platform: data.platform || data.accountName,
       username: data.username,
       encryptedPassword: data.encryptedPassword || data.password,
@@ -177,23 +204,31 @@ export class ApiService {
   }
 
   getFavorites() {
-    return this.http.get<any[]>(`${this.BASE_URL}/vault/favorites`);
+    const userId = this.getUserId();
+    return this.http.get<any[]>(`${this.BASE_URL}/vault/favorites?userId=${userId}`);
   }
 
-  generateVaultCode() {
-    return this.http.get(`${this.BASE_URL}/vault/generate-code`, { responseType: 'text' });
+  generateVaultCode(email: string) {
+    const params = new HttpParams().set('email', email);
+    return this.http.get(`${this.BASE_URL}/vault/generate-code`, { params, responseType: 'text' })
+      .pipe(tap(code => {
+        this.emailSim.showEmail(email, code);
+      }));
   }
 
   searchVault(usernameOrEmail: string, keyword: string) {
-    return this.http.get<any[]>(`${this.BASE_URL}/vault/search?platform=${keyword}`);
+    const userId = this.getUserId();
+    return this.http.get<any[]>(`${this.BASE_URL}/vault/search?platform=${keyword}&userId=${userId}`);
   }
 
   filterVault(usernameOrEmail: string, category: string) {
-    return this.http.get<any[]>(`${this.BASE_URL}/vault/category/${category}`);
+    const userId = this.getUserId();
+    return this.http.get<any[]>(`${this.BASE_URL}/vault/category/${category}?userId=${userId}`);
   }
 
   sortVault(usernameOrEmail: string, sortBy: string) {
-    return this.http.get<any[]>(`${this.BASE_URL}/vault/sort`);
+    const userId = this.getUserId();
+    return this.http.get<any[]>(`${this.BASE_URL}/vault/sort?userId=${userId}`);
   }
 
   getOldPasswords(usernameOrEmail: string) {
@@ -241,11 +276,11 @@ export class ApiService {
 
   // ================= NOTIFICATIONS =================
   getUserNotifications(email: string) {
-    return this.http.get<any[]>(`${this.BASE_URL}/notifications/user/${email}`);
+    return this.http.get<any[]>(`${this.BASE_URL}/notifications/user/${encodeURIComponent(email)}`);
   }
 
   getUnreadNotifications(email: string) {
-    return this.http.get<any[]>(`${this.BASE_URL}/notifications/user/${email}/unread`);
+    return this.http.get<any[]>(`${this.BASE_URL}/notifications/user/${encodeURIComponent(email)}/unread`);
   }
 
   markNotificationAsRead(id: number) {

@@ -29,9 +29,14 @@ export class GeneratorHomeComponent {
   generatedPasswords: string[] = [];
   selectedPassword = '';
   copied = false;
+  loading = false;
+  toastMessage = '';
+  toastType = '';
 
   generate() {
-
+    this.loading = true;
+    this.generatedPasswords = [];
+    
     const payload = {
       count: this.count,
       length: this.length,
@@ -46,11 +51,25 @@ export class GeneratorHomeComponent {
       next: (res: string[]) => {
         this.generatedPasswords = res;
         this.selectedPassword = '';
+        this.loading = false;
+        this.showToast('Passwords generated successfully!', 'success');
+        
+        // Scroll to results
+        setTimeout(() => {
+          document.querySelector('.generated-list-title')?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
       },
       error: () => {
-        alert('Error generating passwords');
+        this.loading = false;
+        this.showToast('Error generating passwords. Please try again.', 'error');
       }
     });
+  }
+
+  showToast(msg: string, type: string) {
+    this.toastMessage = msg;
+    this.toastType = type;
+    setTimeout(() => { this.toastMessage = ''; }, 3000);
   }
 
   selectPassword(password: string) {

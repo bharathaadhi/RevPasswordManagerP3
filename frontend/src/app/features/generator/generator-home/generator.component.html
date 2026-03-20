@@ -1,4 +1,7 @@
 <div class="generator-wrapper">
+  <div class="toast" *ngIf="toastMessage" [ngClass]="toastType">
+    {{ toastMessage }}
+  </div>
 
   <div class="card generator-card">
 
@@ -16,8 +19,9 @@
       <label><input type="checkbox" [(ngModel)]="includeSymbols"> Symbols</label>
     </div>
 
-    <button class="btn" (click)="generate()">
-      Generate Passwords
+    <button class="btn" (click)="generate()" [disabled]="loading">
+      <span *ngIf="!loading">Generate Passwords</span>
+      <span *ngIf="loading">Generating...</span>
     </button>
 
     <!-- PREMIUM ANALYZER -->
@@ -61,7 +65,7 @@
     <!-- GENERATED LIST -->
     <div *ngIf="generatedPasswords.length > 0">
 
-      <h3>Generated Passwords</h3>
+      <h3 class="generated-list-title">Generated Passwords</h3>
 
       <div *ngFor="let pass of generatedPasswords"
            (click)="selectPassword(pass)"

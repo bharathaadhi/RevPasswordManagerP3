@@ -47,7 +47,7 @@ export class DashboardComponent implements OnInit {
 
   loadDashboard(): void {
 
-    const user = localStorage.getItem('username');
+    const user = this.api.getLoggedUser();
     if (!user) return;
 
     this.loading = true;

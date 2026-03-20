@@ -3,4 +3,5 @@ com\rev\notificationservice\entity\Notification.class
 com\rev\notificationservice\repository\NotificationRepository.class
 com\rev\notificationservice\service\NotificationService.class
 com\rev\notificationservice\dto\NotificationRequest.class
+com\rev\notificationservice\config\WebSocketConfig.class
 com\rev\notificationservice\controller\NotificationController.class

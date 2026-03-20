@@ -202,7 +202,7 @@ export class LoginComponent {
     public api: ApiService,
     private router: Router,
     private cd: ChangeDetectorRef
-  ) {}
+  ) { }
 
   togglePassword() {
     this.showPassword = !this.showPassword;
@@ -223,35 +223,38 @@ export class LoginComponent {
     this.cd.detectChanges();
 
     this.api.login({
-      usernameOrEmail: this.usernameOrEmail,
+      email: this.usernameOrEmail.includes('@') ? this.usernameOrEmail : null,
+      username: !this.usernameOrEmail.includes('@') ? this.usernameOrEmail : null,
       masterPassword: this.password
     })
-    .subscribe({
-      next: (res: any) => {
-        this.loading = false;
-        this.cd.detectChanges();
-
-        if (res.twoFactorRequired) {
-          this.loginResponse = res;
-          this.otpUser = res.username;
-          this.otpEmail = res.email || this.otpUser;
-          
-          this.api.generateVerificationCode(this.otpEmail).subscribe();
-          
-          this.showOtpModal = true;
+      .subscribe({
+        next: (res: any) => {
+          this.loading = false;
           this.cd.detectChanges();
-          return;
-        }
 
-        this.successMessage = "Login successful";
-        this.loginSuccess(res);
-      },
-      error: (err) => {
-        this.loading = false;
-        this.errorMessage = err?.error?.message || "Invalid credentials";
-        this.cd.detectChanges();
-      }
-    });
+          if (res.twoFactorRequired) {
+            this.loginResponse = res;
+            this.otpUser = res.username;
+            this.otpEmail = res.email || this.otpUser;
+
+            this.api.generateVerificationCode(this.otpEmail).subscribe();
+
+            this.showOtpModal = true;
+            this.cd.detectChanges();
+            return;
+          }
+
+          setTimeout(() => {
+            this.successMessage = "Login successful";
+            this.loginSuccess(res);
+          });
+        },
+        error: (err) => {
+          this.loading = false;
+          this.errorMessage = err?.error?.message || "Invalid credentials";
+          this.cd.detectChanges();
+        }
+      });
   }
 
   /* ================= VERIFY OTP ================= */
@@ -280,11 +283,11 @@ export class LoginComponent {
           this.verifyLoading = false;
           // 🛡️ Robust error parsing for descriptive backend errors
           this.errorMessage = err?.error?.message || err?.error || "Invalid OTP";
-          
+
           if (typeof this.errorMessage === 'object') {
             this.errorMessage = JSON.stringify(this.errorMessage);
           }
-          
+
           this.cd.detectChanges();
         }
       });
@@ -294,9 +297,10 @@ export class LoginComponent {
 
   loginSuccess(res: any) {
     if (!res) return;
-    localStorage.setItem('token', res.token);
-    localStorage.setItem('username', res.username);
-    localStorage.setItem('userId', res.userId);
+    if (res.token) localStorage.setItem('token', res.token);
+    if (res.username) localStorage.setItem('username', res.username);
+    if (res.email) localStorage.setItem('email', res.email);
+    if (res.userId) localStorage.setItem('userId', res.userId.toString());
     this.router.navigate(['/dashboard']);
   }
 }

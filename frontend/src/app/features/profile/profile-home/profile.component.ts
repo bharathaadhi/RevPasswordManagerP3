@@ -35,6 +35,7 @@ export class ProfileHomeComponent implements OnInit {
 
   securityQuestions: any[] = [];
   answers: string[] = ['', '', ''];
+  isLoadingQuestions = false;
 
   weakPasswords = 0;
   reusedPasswords = 0;
@@ -59,10 +60,11 @@ export class ProfileHomeComponent implements OnInit {
   /* ================= LOAD PROFILE ================= */
   loadProfile() {
 
-    let user = '';
+    const user = this.api.getLoggedUser();
 
-    if (isPlatformBrowser(this.platformId)) {
-      user = localStorage.getItem('username') || '';
+    if (!user) {
+      console.warn("No user found in localStorage");
+      return;
     }
 
     this.api.getProfile(user)
@@ -75,17 +77,30 @@ export class ProfileHomeComponent implements OnInit {
           this.twoFactorEnabled =
             res.twoFactorEnabled;
         },
-        error: () => {
-          alert("Failed to load profile");
+        error: (err) => {
+          console.error("Profile load error:", err);
+          alert("Failed to load profile for: " + user);
         }
       });
   }
 
   /* ================= SAVE PROFILE ================= */
   saveProfile() {
+    
+    const emailRegex = /^[A-Za-z0-9+_.-]+@(.+)$/;
+    if (!this.email || !emailRegex.test(this.email.trim())) {
+      alert("Invalid email format");
+      return;
+    }
+
+    const phoneRegex = /^\d{10}$/;
+    if (!this.phone || !phoneRegex.test(this.phone.trim())) {
+      alert("Phone number must be exactly 10 digits");
+      return;
+    }
 
     const payload = {
-      userId: Number(localStorage.getItem('userId')),
+      userId: this.api.getUserId(),
       name: this.name,
       email: this.email,
       phone: this.phone
@@ -126,22 +141,22 @@ export class ProfileHomeComponent implements OnInit {
   /* ================= TOGGLE 2FA ================= */
 
   load2FA() {
-
-    const user =
-      localStorage.getItem('username') || '';
+    const user = this.api.getLoggedUser();
+    if (!user) return;
 
     this.api.get2FAStatus(user)
       .subscribe((res: any) => {
-
         this.twoFactorEnabled = res.enabled;
-
       });
   }
 
   toggle2FA(event: any) {
-
     const enabled = event.target.checked;
-    const username = localStorage.getItem('username') || '';
+    const username = this.api.getLoggedUser();
+    if (!username) {
+        alert("Session expired. Please login again.");
+        return;
+    }
 
     this.api.toggle2FA(username, enabled)
       .subscribe({
@@ -158,8 +173,9 @@ export class ProfileHomeComponent implements OnInit {
           this.router.navigate(['/login']);
         },
 
-        error: () => {
-          alert("Failed to update 2FA configuration");
+        error: (err) => {
+          const msg = err?.error?.message || err?.error || "Failed to update 2FA configuration";
+          alert(typeof msg === 'string' ? msg : JSON.stringify(msg));
           this.twoFactorEnabled = !enabled;
         }
       });
@@ -167,23 +183,32 @@ export class ProfileHomeComponent implements OnInit {
 
   /* ================= QUESTIONS ================= */
   loadQuestions() {
+    const user = this.api.getLoggedUser();
+    if (!user) return;
 
-    const user = localStorage.getItem('username') || '';
-
+    this.isLoadingQuestions = true;
     this.api.getSecurityQuestions(user)
-      .subscribe(q => {
-        this.securityQuestions =
-          q.map((x: any) => ({ question: x }));
-
-        this.answers =
-          new Array(this.securityQuestions.length).fill('');
+      .pipe(finalize(() => this.isLoadingQuestions = false))
+      .subscribe({
+        next: (q) => {
+          if (!q || q.length === 0) {
+            console.warn("No security questions found for user:", user);
+          }
+          this.securityQuestions = q.map((x: any) => ({ question: x }));
+          this.answers = new Array(this.securityQuestions.length).fill('');
+        },
+        error: (err) => {
+          console.error("Failed to load security questions:", err);
+        }
       });
   }
 
   updateAnswers() {
 
+    const usernameOrEmail = this.api.getLoggedUser();
+    
     const payload = {
-      usernameOrEmail: localStorage.getItem('username'),
+      usernameOrEmail: usernameOrEmail,
       securityQuestions:
         this.securityQuestions.map((q, i) => ({
           question: q.question,
@@ -195,8 +220,14 @@ export class ProfileHomeComponent implements OnInit {
 
     this.api.updateSecurityAnswers(payload)
       .pipe(finalize(() => this.isSaving = false))
-      .subscribe(() => {
-        alert("Answers updated successfully");
+      .subscribe({
+        next: (res: any) => {
+          alert(res?.message || "Answers updated successfully");
+        },
+        error: (err) => {
+          const msg = err?.error?.message || err?.error || "Failed to update security answers";
+          alert(typeof msg === 'string' ? msg : JSON.stringify(msg));
+        }
       });
   }
 
@@ -217,7 +248,7 @@ export class ProfileHomeComponent implements OnInit {
     }
 
     const payload = {
-      usernameOrEmail: localStorage.getItem('username'),
+      usernameOrEmail: this.api.getLoggedUser(),
       currentPassword: this.currentMasterPassword,
       newPassword: this.newMasterPassword
     };

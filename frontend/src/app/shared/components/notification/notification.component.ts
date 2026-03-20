@@ -14,6 +14,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
   unreadCount = 0;
   showDropdown = false;
   private intervalId: any;
+  private lastNotifId = -1;
 
   private platformId = inject(PLATFORM_ID);
 
@@ -21,7 +22,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadNotifications();
-    if (typeof window !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       this.intervalId = setInterval(() => this.loadNotifications(), 10000);
     }
   }
@@ -49,16 +50,35 @@ export class NotificationComponent implements OnInit, OnDestroy {
   loadNotifications() {
     if (!isPlatformBrowser(this.platformId)) return;
     
-    const email = localStorage.getItem('username');
+    const email = this.api.getLoggedUser();
     if (!email) return;
 
     this.api.getUserNotifications(email).subscribe({
       next: (res: any) => {
-        // Robust check for array
+        const oldLastId = this.lastNotifId;
         this.notifications = Array.isArray(res) ? res : [];
-        this.unreadCount = this.notifications.filter(n => n && !n.readStatus && !n.read).length;
+        
+        // Defensive count: check both possible field names from backend
+        this.unreadCount = this.notifications.filter(n => {
+          if (!n) return false;
+          // Check for readStatus (JsonProperty) or isRead or read
+          const isRead = n.readStatus === true || n.isRead === true || n.read === true;
+          return !isRead;
+        }).length;
+
+        console.log(`[Notification] Loaded for ${email}: ${this.notifications.length} total, ${this.unreadCount} unread.`);
+
+        if (this.notifications.length > 0) {
+          const latest = this.notifications[0];
+          this.lastNotifId = Math.max(this.lastNotifId, latest.id);
+          
+          if (oldLastId !== -1 && latest.id > oldLastId) {
+            this.api.showSimulatedNotification(email, latest.title, latest.message);
+          }
+        }
       },
-      error: () => {
+      error: (err) => {
+        console.error('Failed to load notifications:', err);
         this.notifications = [];
         this.unreadCount = 0;
       }
@@ -67,10 +87,16 @@ export class NotificationComponent implements OnInit, OnDestroy {
 
   markAsRead(notification: any, event: Event) {
     event.stopPropagation();
-    this.api.markNotificationAsRead(notification.id).subscribe(() => {
-      notification.read = true;
-      notification.readStatus = true;
-      this.unreadCount = Math.max(0, this.unreadCount - 1);
+    if (!notification || !notification.id) return;
+
+    this.api.markNotificationAsRead(notification.id).subscribe({
+      next: () => {
+        notification.read = true;
+        notification.readStatus = true;
+        notification.isRead = true;
+        this.unreadCount = Math.max(0, this.unreadCount - 1);
+      },
+      error: (err) => console.error('Failed to mark notification as read:', err)
     });
   }
 }

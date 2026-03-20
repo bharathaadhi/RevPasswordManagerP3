@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.annotation.Async;
+import java.util.stream.Collectors;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -39,13 +42,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User register(RegisterRequest request) {
         // Check if user already exists
-        if (userRepository.existsByEmail(request.getEmail())) {
+        String normalizedEmail = request.getEmail() != null ? request.getEmail().toLowerCase().trim() : "";
+        if (userRepository.existsByEmail(normalizedEmail)) {
             throw new RuntimeException("Email already registered");
         }
 
         User user = new User();
         user.setName(request.getEffectiveName());
-        user.setEmail(request.getEmail());
+        user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(request.getEffectivePassword()));
         user.setPhone(request.getPhone());
         User savedUser = userRepository.save(user);
@@ -54,7 +58,7 @@ public class UserServiceImpl implements UserService {
         if (request.getSecurityQuestions() != null) {
             for (RegisterRequest.SecurityQuestionItem sq : request.getSecurityQuestions()) {
                 SecurityQuestion entity = new SecurityQuestion();
-                entity.setEmail(request.getEmail());
+                entity.setEmail(normalizedEmail);
                 entity.setQuestion(sq.getQuestion());
                 entity.setAnswer(sq.getAnswer());
                 securityQuestionRepository.save(entity);
@@ -66,11 +70,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String login(LoginRequest request) {
-        String identifier = request.getEffectiveEmail();
-        String password = request.getEffectivePassword();
+        String identifier = request.getIdentifier() != null ? request.getIdentifier().trim() : "";
+        String password = request.getPasswordValue();
 
-        // Try to find by email first, then by name (username)
-        Optional<User> user = userRepository.findFirstByEmail(identifier);
+        // Try to find by email first (normalized), then by name
+        Optional<User> user = userRepository.findFirstByEmail(identifier.toLowerCase());
         if (user.isEmpty()) {
             user = userRepository.findFirstByName(identifier);
         }
@@ -282,13 +286,37 @@ public class UserServiceImpl implements UserService {
         return "Master password updated successfully";
     }
 
-    private void safeSendNotification(String email, String title, String msg, String type) {
+    @Override
+    public List<String> getSecurityQuestions(String usernameOrEmail) {
+        String normalized = usernameOrEmail != null ? usernameOrEmail.trim() : "";
+        Optional<User> userOpt = userRepository.findFirstByEmail(normalized.toLowerCase());
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findFirstByName(normalized);
+        }
+        
+        String email = userOpt.isPresent() ? userOpt.get().getEmail() : normalized.toLowerCase();
+        
+        List<SecurityQuestion> questions = securityQuestionRepository.findAllByEmail(email);
+        if (questions.isEmpty()) {
+            return List.of(
+                    "What is your first school name?",
+                    "What is your favorite movie?",
+                    "What is your birth city?"
+            );
+        }
+        return questions.stream()
+                .map(SecurityQuestion::getQuestion)
+                .collect(Collectors.toList());
+    }
+
+    @Async
+    protected void safeSendNotification(String email, String title, String msg, String type) {
         try {
-            notificationClient.sendNotification(Map.of(
-                    "recipientEmail", email,
-                    "title", title,
-                    "message", msg,
-                    "type", type
+            notificationClient.sendNotification(new NotificationRequest(
+                    email,
+                    title,
+                    msg,
+                    type
             ));
         } catch (Exception e) {
             System.err.println("Failed to send notification: " + e.getMessage());

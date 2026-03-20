@@ -112,6 +112,14 @@
 
       <h3>❓ Security Questions</h3>
 
+      <div *ngIf="isLoadingQuestions" class="loading-state">
+        Loading security questions...
+      </div>
+
+      <div *ngIf="!isLoadingQuestions && securityQuestions.length === 0" class="empty-state">
+        No security questions found.
+      </div>
+
       <div class="question-box" *ngFor="let q of securityQuestions; let i=index">
 
         <input class="question" [value]="q.question" readonly>

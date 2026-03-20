@@ -9,20 +9,19 @@ import java.util.List;
 public interface VaultService {
 
     VaultEntry saveVault(VaultRequestDto dto);
-    List<VaultEntry> getFavorites();
     List<VaultEntry> getAllVaults();
-    VaultEntry updateVault(Long id, VaultRequestDto dto);
     List<VaultEntry> getByUser(Long userId);
-    void deleteVaultWithCode(Long id, String code, String masterPassword, String email);
     void deleteVault(Long id);
-    String revealPassword(Long id, String masterPassword, String email);
-    List<VaultEntry> searchByPlatform(String platform);
-    String revealPassword(Long id);
-    String generateCode();
+    List<VaultEntry> searchByPlatform(String platform, Long userId);
     VaultEntry markFavorite(Long id, boolean favorite);
-    List<VaultEntry> getByCategory(String category);
-    List<VaultEntry> sortByPlatform();
-
+    String revealPassword(Long id);
+    String revealPassword(Long id, String masterPassword, String email, String code);
+    List<VaultEntry> getByCategory(String category, Long userId);
+    String generateCode(String email);
+    void deleteVaultWithCode(Long id, String code, String masterPassword, String email);
+    VaultEntry updateVault(Long id, VaultRequestDto dto);
+    List<VaultEntry> getFavorites(Long userId);
+    List<VaultEntry> sortByPlatform(Long userId);
     List<VaultEntry> exportVaultSecure(BackupRequestDto dto);
     void importVaultSecure(BackupRequestDto dto);
 }

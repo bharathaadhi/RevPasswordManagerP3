@@ -31,17 +31,10 @@ export class BackupComponent {
   // ================= GENERATE CODE =================
 
   generateCode() {
-    this.api.generateVaultCode()
-      .subscribe((code: string) => {
-        alert(`
-📧 REV PASSWORD MANAGER EMAIL
+    const email = this.api.getLoggedUser();
+    if (!email) return;
 
-Your verification code is:
-👉 ${code}
-
-This code expires in 5 minutes.
-        `);
-      });
+    this.api.generateVaultCode(email).subscribe();
   }
 
   // ================= EXPORT =================
@@ -53,7 +46,7 @@ This code expires in 5 minutes.
 
     const payload = {
       userId: Number(userId),
-      email: localStorage.getItem('username'),
+      email: this.api.getLoggedUser(),
       masterPassword: this.exportMasterPassword,
       code: this.exportVerificationCode
     };
@@ -74,7 +67,8 @@ This code expires in 5 minutes.
           alert("Vault Exported Successfully");
         },
         error: (err) => {
-          alert(err.error || "Export Failed: Invalid Credentials");
+          const msg = err?.error?.message || err?.error || "Export Failed: Invalid Credentials";
+          alert(typeof msg === 'string' ? msg : JSON.stringify(msg));
         }
       });
   }
@@ -104,7 +98,7 @@ This code expires in 5 minutes.
 
         const payload = {
           userId: Number(userId),
-          email: localStorage.getItem('username'),
+          email: this.api.getLoggedUser(),
           masterPassword: this.importMasterPassword,
           code: this.importVerificationCode,
           entries: data
@@ -115,7 +109,10 @@ This code expires in 5 minutes.
             alert("Import Successful");
             this.router.navigate(['/vault']);
           },
-          error: (err) => alert(err.error || "Import Failed: Invalid Credentials")
+          error: (err) => {
+            const msg = err?.error?.message || err?.error || "Import Failed: Invalid Credentials";
+            alert(typeof msg === 'string' ? msg : JSON.stringify(msg));
+          }
         });
       } catch (e) {
         alert("Invalid JSON file");

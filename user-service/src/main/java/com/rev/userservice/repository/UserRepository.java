@@ -8,12 +8,12 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     
-    @Query("SELECT u FROM User u WHERE u.email = :email")
+    @Query("SELECT u FROM User u WHERE LOWER(u.email) = LOWER(:email)")
     Optional<User> findFirstByEmail(@Param("email") String email);
-    
-    @Query("SELECT u FROM User u WHERE u.name = :name")
+ 
+    @Query("SELECT u FROM User u WHERE LOWER(u.name) = LOWER(:name)")
     Optional<User> findFirstByName(@Param("name") String name);
-    
-    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE u.email = :email")
+ 
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE LOWER(u.email) = LOWER(:email)")
     boolean existsByEmail(@Param("email") String email);
 }

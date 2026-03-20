@@ -35,6 +35,24 @@ export class EmailSimulatorService {
     }, 15000);
   }
 
+  showNotification(to: string, title: string, message: string) {
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+
+    this.emailSubject.next({
+      to,
+      subject: title,
+      body: message,
+      code: '',
+      expiresAt
+    });
+
+    // Auto-hide after 15 seconds
+    setTimeout(() => {
+      this.hideEmail();
+    }, 15000);
+  }
+
   hideEmail() {
     this.emailSubject.next(null);
   }

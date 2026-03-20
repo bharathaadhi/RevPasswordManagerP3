@@ -79,13 +79,16 @@ class VaultServiceImplTest {
         when(authFeignClient.verifyMasterPassword(any(MasterPasswordDto.class))).thenReturn(true);
         when(vaultRepository.findById(1L)).thenReturn(Optional.of(vaultEntry));
 
+        String code = vaultService.generateCode("test@ex.com");
+        
         // Note: AES decrypt will try to decrypt "encrypted_data" which is invalid Base64 padding, 
         // leading to exception if actually invoked. We just ensure no Auth error is thrown before that.
         try {
-            vaultService.revealPassword(1L, "master_pass", "test@ex.com");
+            vaultService.revealPassword(1L, "master_pass", "test@ex.com", code);
         } catch (Exception e) {
             // Expected due to dummy encrypted_data failing AES but NOT auth fail
             assertNotEquals("Invalid master password", e.getMessage());
+            assertNotEquals("Invalid verification code", e.getMessage());
         }
         
         verify(authFeignClient, times(1)).verifyMasterPassword(any(MasterPasswordDto.class));
@@ -96,7 +99,7 @@ class VaultServiceImplTest {
         when(authFeignClient.verifyMasterPassword(any(MasterPasswordDto.class))).thenReturn(false);
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> 
-            vaultService.revealPassword(1L, "wrong_pass", "test@ex.com")
+            vaultService.revealPassword(1L, "wrong_pass", "test@ex.com", "123456")
         );
         assertEquals("Invalid master password", ex.getMessage());
     }

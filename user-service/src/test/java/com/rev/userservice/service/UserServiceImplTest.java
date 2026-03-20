@@ -91,7 +91,7 @@ class UserServiceImplTest {
 
         assertEquals("mocked_jwt_token", token);
         // Verify notification was invoked
-        verify(notificationClient, times(1)).sendNotification(anyMap());
+        verify(notificationClient, times(1)).sendNotification(any(com.rev.userservice.dto.NotificationRequest.class));
     }
 
     @Test

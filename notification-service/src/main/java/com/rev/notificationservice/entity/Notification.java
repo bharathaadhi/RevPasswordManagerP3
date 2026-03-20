@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.PrePersist;
 import lombok.Data;
 import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 
@@ -21,6 +23,8 @@ public class Notification {
     private String title;
     private String message;
     private String type; // e.g., SECURITY, ALERT, INFO
+    @Column(name = "read_status")
+    @JsonProperty("readStatus")
     private boolean isRead = false;
 
     private LocalDateTime timestamp;

@@ -4,24 +4,41 @@ import lombok.Data;
 
 @Data
 public class LoginRequest {
-    private String email;
-    private String password;
-    private String usernameOrEmail;  // frontend sends this
-    private String masterPassword;   // frontend sends this
 
-    // Helper: get the effective email/username
-    public String getEffectiveEmail() {
-        if (usernameOrEmail != null && !usernameOrEmail.isEmpty()) {
+    // Login identifier
+    private String email;
+    private String username;
+    private String usernameOrEmail;
+
+    // Password
+    private String password;
+    private String masterPassword;
+
+    // Get the identifier (email OR username)
+    public String getIdentifier() {
+
+        if (usernameOrEmail != null && !usernameOrEmail.isBlank()) {
             return usernameOrEmail;
         }
-        return email;
+
+        if (email != null && !email.isBlank()) {
+            return email;
+        }
+
+        if (username != null && !username.isBlank()) {
+            return username;
+        }
+
+        return null;
     }
 
-    // Helper: get the effective password
-    public String getEffectivePassword() {
-        if (masterPassword != null && !masterPassword.isEmpty()) {
+    // Get the password (masterPassword preferred)
+    public String getPasswordValue() {
+
+        if (masterPassword != null && !masterPassword.isBlank()) {
             return masterPassword;
         }
+
         return password;
     }
 }

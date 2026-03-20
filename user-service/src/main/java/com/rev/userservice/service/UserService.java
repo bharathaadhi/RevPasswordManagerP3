@@ -22,4 +22,5 @@ public interface UserService {
     String logout(String email);
     boolean verifyMasterPassword(MasterPasswordDto dto);
     String updateMasterPassword(UpdateMasterPasswordRequest request);
+    java.util.List<String> getSecurityQuestions(String usernameOrEmail);
 }

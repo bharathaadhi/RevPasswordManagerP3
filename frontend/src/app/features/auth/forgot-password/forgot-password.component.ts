@@ -57,8 +57,8 @@ export class ForgotPasswordComponent {
           this.step = 2;
         },
 
-        error: () => {
-          this.errorMessage = "User not found";
+        error: (err) => {
+          this.errorMessage = err?.error?.message || err?.error || "User not found";
         }
       });
   }
@@ -114,9 +114,8 @@ export class ForgotPasswordComponent {
 
         error: (err) => {
           this.successMessage = '';
-          this.errorMessage =
-            err?.error?.message ||
-            "Password reset failed";
+          const msg = err?.error?.message || err?.error || "Password reset failed";
+          this.errorMessage = typeof msg === 'string' ? msg : JSON.stringify(msg);
         }
       });
   }

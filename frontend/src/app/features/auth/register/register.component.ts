@@ -18,6 +18,7 @@ export class RegisterComponent {
 
   successMessage = '';
   errorMessage = '';
+  isRegistering = false;
 
   securityQuestionOptions = [
     'What is your first school name?',
@@ -62,6 +63,22 @@ export class RegisterComponent {
       return;
     }
 
+    if (username.trim().length < 2) {
+      this.errorMessage = 'Name must be at least 2 characters';
+      return;
+    }
+
+    const emailRegex = /^[A-Za-z0-9+_.-]+@(.+)$/;
+    if (!emailRegex.test(email.trim())) {
+      this.errorMessage = 'Invalid email format';
+      return;
+    }
+
+    if (masterPassword.length < 8) {
+      this.errorMessage = 'Password must be at least 8 characters';
+      return;
+    }
+
     this.errorMessage = '';
     this.step = 2;
   }
@@ -71,6 +88,7 @@ export class RegisterComponent {
   }
 
   register(): void {
+    if (this.isRegistering) return;
 
     const hasEmpty = this.registerData.securityQuestions.some(
       q => !q.question || !q.answer?.trim()
@@ -78,6 +96,12 @@ export class RegisterComponent {
 
     if (hasEmpty) {
       this.errorMessage = 'Please complete all security questions';
+      return;
+    }
+
+    const phoneRegex = /^\d{10}$/;
+    if (!this.registerData.phone || !phoneRegex.test(this.registerData.phone)) {
+      this.errorMessage = 'Phone number must be exactly 10 digits';
       return;
     }
 
@@ -92,20 +116,28 @@ export class RegisterComponent {
       return;
     }
 
-    this.api.register(this.registerData).subscribe({
+    this.isRegistering = true;
+    const payload = {
+      ...this.registerData,
+      name: this.registerData.username,
+      password: this.registerData.masterPassword
+    };
+
+    this.api.register(payload).subscribe({
 
       next: (res: any) => {
-
+        console.log('Registration success:', res);
+        this.isRegistering = false;
         this.errorMessage = '';
-        this.successMessage = res.message || "User registered successfully!";
-
+        this.successMessage = "User registered successfully! Please log in to your secure vault.";
         this.step = 3;   
       },
 
       error: (err) => {
+        this.isRegistering = false;
         this.successMessage = '';
-        this.errorMessage =
-          err?.error?.message || "Registration failed";
+        const msg = err?.error?.message || err?.error || "Registration failed";
+        this.errorMessage = typeof msg === 'string' ? msg : JSON.stringify(msg);
       }
 
     });

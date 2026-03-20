@@ -499,7 +499,7 @@ export class VaultHomeComponent implements OnInit {
 
     this.isVerifying = true; // FIX: Set to true BEFORE request
 
-    this.api.revealPassword(this.selectedEntryId, this.masterPasswordInput)
+    this.api.revealPassword(this.selectedEntryId, this.masterPasswordInput, this.viewVerificationCode)
       .pipe(finalize(() => this.isVerifying = false))
       .subscribe({
         next: (decryptedPassword: string) => {
@@ -522,16 +522,12 @@ export class VaultHomeComponent implements OnInit {
   /* ================= GENERATE CODE ================= */
 
   generateViewCode() {
-    this.api.generateVaultCode().subscribe({
+    const email = localStorage.getItem('email') || localStorage.getItem('username');
+    if (!email) return;
+
+    this.api.generateVaultCode(email).subscribe({
       next: (code: string) => {
-        alert(`
-📧 REV PASSWORD MANAGER EMAIL
-
-Your verification code is:
-👉 ${code}
-
-This code expires in 5 minutes.
-        `);
+        // No alert needed, simulation will pop up
       },
       error: () => {
         this.showToast("Failed to generate verification code", "toast-error");

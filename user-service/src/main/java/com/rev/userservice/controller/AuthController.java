@@ -1,9 +1,7 @@
 package com.rev.userservice.controller;
 
 import com.rev.userservice.dto.*;
-import com.rev.userservice.entity.SecurityQuestion;
 import com.rev.userservice.model.User;
-import com.rev.userservice.repository.SecurityQuestionRepository;
 import com.rev.userservice.repository.UserRepository;
 import com.rev.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -23,13 +20,10 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private SecurityQuestionRepository securityQuestionRepository;
-
     // ============ REGISTER / LOGIN / LOGOUT ============
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@jakarta.validation.Valid @RequestBody RegisterRequest request) {
         try {
             User user = userService.register(request);
             return ResponseEntity.ok(user);
@@ -42,17 +36,19 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             String token = userService.login(request);
-            String identifier = request.getEffectiveEmail();
-            // Find user by email or name
-            User user = userRepository.findFirstByEmail(identifier).orElse(null);
-            if (user == null) user = userRepository.findFirstByName(identifier).orElse(null);
+            String identifier = request.getIdentifier() != null ? request.getIdentifier().trim() : "";
+            
+            // Try to find by email first (normalized lowercase), then by name
+            User user = userRepository.findFirstByEmail(identifier.toLowerCase()).orElse(null);
+            if (user == null) {
+                user = userRepository.findFirstByName(identifier).orElse(null);
+            }
 
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
-            response.put("email", user != null ? user.getEmail() : identifier);
+            response.put("email", user != null ? user.getEmail() : identifier.toLowerCase());
             response.put("username", user != null ? user.getName() : identifier);
             response.put("twoFactorEnabled", user != null && user.isTwoFactorEnabled());
-            
             response.put("twoFactorRequired", user != null && user.isTwoFactorEnabled());
             
             if (user != null) {
@@ -66,15 +62,16 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestParam String email) {
+    public ResponseEntity<String> logout(@RequestParam("email") String email) {
         return ResponseEntity.ok(userService.logout(email));
     }
 
     // ============ PROFILE ============
 
     @GetMapping("/profile")
-    public ResponseEntity<?> getProfile(@RequestParam String usernameOrEmail) {
-        Optional<User> userOpt = userRepository.findFirstByEmail(usernameOrEmail);
+    public ResponseEntity<?> getProfile(@RequestParam("usernameOrEmail") String usernameOrEmail) {
+        String normalized = usernameOrEmail != null ? usernameOrEmail.toLowerCase().trim() : "";
+        Optional<User> userOpt = userRepository.findFirstByEmail(normalized);
         if (userOpt.isEmpty()) {
             userOpt = userRepository.findFirstByName(usernameOrEmail);
         }
@@ -117,16 +114,23 @@ public class AuthController {
         // Name is fixed, ONLY update email and phone
         if (payload.containsKey("email")) {
             String newEmail = (String) payload.get("email");
+            if (newEmail == null || !newEmail.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Invalid email format"));
+            }
             // Basic check if email already exists for another user
-            Optional<User> existing = userRepository.findFirstByEmail(newEmail);
+            Optional<User> existing = userRepository.findFirstByEmail(newEmail.toLowerCase());
             if (existing.isPresent() && !existing.get().getId().equals(user.getId())) {
                 return ResponseEntity.badRequest().body(Map.of("message", "Email already in use by another user"));
             }
-            user.setEmail(newEmail);
+            user.setEmail(newEmail.toLowerCase().trim());
         }
         
         if (payload.containsKey("phone")) {
-            user.setPhone((String) payload.get("phone"));
+            String newPhone = (String) payload.get("phone");
+            if (newPhone == null || !newPhone.matches("^\\d{10}$")) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Phone number must be exactly 10 digits"));
+            }
+            user.setPhone(newPhone);
         }
         
         userRepository.save(user);
@@ -145,20 +149,9 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/security-questions/{usernameOrEmail}")
-    public ResponseEntity<List<String>> getSecurityQuestions(@PathVariable String usernameOrEmail) {
-        List<SecurityQuestion> questions = securityQuestionRepository.findAllByEmail(usernameOrEmail);
-        if (questions.isEmpty()) {
-            return ResponseEntity.ok(List.of(
-                    "What is your first school name?",
-                    "What is your favorite movie?",
-                    "What is your birth city?"
-            ));
-        }
-        List<String> qList = questions.stream()
-                .map(SecurityQuestion::getQuestion)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(qList);
+    @GetMapping({"/security-questions", "/security_questions"})
+    public ResponseEntity<List<String>> getSecurityQuestions(@RequestParam("usernameOrEmail") String usernameOrEmail) {
+        return ResponseEntity.ok(userService.getSecurityQuestions(usernameOrEmail));
     }
 
     // ============ PASSWORD RECOVERY ============
@@ -190,7 +183,7 @@ public class AuthController {
     // ============ 2FA ============
 
     @PostMapping("/generate-2fa")
-    public ResponseEntity<String> generate2FA(@RequestParam String email) {
+    public ResponseEntity<String> generate2FA(@RequestParam("email") String email) {
         return ResponseEntity.ok(userService.generate2FACode(email));
     }
 
@@ -204,8 +197,12 @@ public class AuthController {
     }
 
     @GetMapping("/2fa-status")
-    public ResponseEntity<Map<String, Object>> get2FAStatus(@RequestParam String usernameOrEmail) {
-        Optional<User> userOpt = userRepository.findFirstByEmail(usernameOrEmail);
+    public ResponseEntity<Map<String, Object>> get2FAStatus(@RequestParam("usernameOrEmail") String usernameOrEmail) {
+        String normalized = usernameOrEmail != null ? usernameOrEmail.toLowerCase().trim() : "";
+        Optional<User> userOpt = userRepository.findFirstByEmail(normalized);
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findFirstByName(usernameOrEmail);
+        }
         Map<String, Object> result = new HashMap<>();
         result.put("enabled", userOpt.map(User::isTwoFactorEnabled).orElse(false));
         return ResponseEntity.ok(result);
@@ -213,13 +210,16 @@ public class AuthController {
 
     @PostMapping("/toggle-2fa")
     public ResponseEntity<Map<String, Object>> toggle2FA(
-            @RequestParam String usernameOrEmail,
-            @RequestParam boolean enabled) {
-        Optional<User> userOpt = userRepository.findFirstByEmail(usernameOrEmail);
+            @RequestParam("usernameOrEmail") String usernameOrEmail,
+            @RequestParam("enabled") boolean enabled) {
+        String normalized = usernameOrEmail != null ? usernameOrEmail.toLowerCase().trim() : "";
+        Optional<User> userOpt = userRepository.findFirstByEmail(normalized);
         if (userOpt.isEmpty()) {
             userOpt = userRepository.findFirstByName(usernameOrEmail);
         }
-        if (userOpt.isEmpty()) return ResponseEntity.notFound().build();
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("message", "User not found"));
+        }
 
         User user = userOpt.get();
         user.setTwoFactorEnabled(enabled);

@@ -5,18 +5,18 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
+import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
-public class RateLimitGatewayFilterFactory extends AbstractGatewayFilterFactory<RateLimitGatewayFilterFactory.Config> {
+public class RateLimit extends AbstractGatewayFilterFactory<RateLimit.Config> {
 
     private final Map<String, UserRateLimit> userRateLimits = new ConcurrentHashMap<>();
 
-    public RateLimitGatewayFilterFactory() {
+    public RateLimit() {
         super(Config.class);
     }
 
@@ -27,51 +27,73 @@ public class RateLimitGatewayFilterFactory extends AbstractGatewayFilterFactory<
 
     @Override
     public GatewayFilter apply(Config config) {
-        return (exchange, chain) -> {
-            String ip = "unknown";
-            if (exchange.getRequest().getRemoteAddress() != null && exchange.getRequest().getRemoteAddress().getAddress() != null) {
-                ip = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
-            }
-            UserRateLimit limit = userRateLimits.computeIfAbsent(ip, k -> new UserRateLimit(config.getCapacity()));
 
-            if (limit.tryAcquire()) {
-                return chain.filter(exchange);
+        return (exchange, chain) -> {
+
+            String ip = "unknown";
+
+            // safer IP detection
+            String forwarded = exchange.getRequest().getHeaders().getFirst("X-Forwarded-For");
+
+            if (forwarded != null) {
+                ip = forwarded;
             } else {
-                exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
-                return exchange.getResponse().setComplete();
+                InetSocketAddress remoteAddress = exchange.getRequest().getRemoteAddress();
+                if (remoteAddress != null && remoteAddress.getAddress() != null) {
+                    ip = remoteAddress.getAddress().getHostAddress();
+                }
             }
+
+            UserRateLimit rateLimit =
+                    userRateLimits.computeIfAbsent(ip,
+                            k -> new UserRateLimit(config.getCapacity(), config.getRefillSeconds()));
+
+            if (rateLimit.tryAcquire()) {
+                return chain.filter(exchange);
+            }
+
+            exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
+            return exchange.getResponse().setComplete();
         };
     }
 
     @Data
     public static class Config {
-        private int capacity = 10;
-        private int refillSeconds = 1;
+        private int capacity = 10;        // max tokens
+        private int refillSeconds = 1;    // refill interval
     }
 
     private static class UserRateLimit {
+
         private final int capacity;
+        private final int refillSeconds;
         private final AtomicInteger tokens;
         private long lastRefillTime;
 
-        public UserRateLimit(int capacity) {
+        public UserRateLimit(int capacity, int refillSeconds) {
             this.capacity = capacity;
+            this.refillSeconds = refillSeconds;
             this.tokens = new AtomicInteger(capacity);
             this.lastRefillTime = System.currentTimeMillis();
         }
 
         public synchronized boolean tryAcquire() {
+
             refill();
+
             if (tokens.get() > 0) {
                 tokens.decrementAndGet();
                 return true;
             }
+
             return false;
         }
 
         private void refill() {
+
             long now = System.currentTimeMillis();
-            if (now - lastRefillTime > 1000) {
+
+            if (now - lastRefillTime > refillSeconds * 1000L) {
                 tokens.set(capacity);
                 lastRefillTime = now;
             }
