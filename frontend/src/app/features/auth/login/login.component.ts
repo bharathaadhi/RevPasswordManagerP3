@@ -301,6 +301,10 @@ export class LoginComponent {
     if (res.username) localStorage.setItem('username', res.username);
     if (res.email) localStorage.setItem('email', res.email);
     if (res.userId) localStorage.setItem('userId', res.userId.toString());
+    
+    // Notify other components (like NotificationComponent) that login was successful
+    this.api.notifyLogin();
+    
     this.router.navigate(['/dashboard']);
   }
 }

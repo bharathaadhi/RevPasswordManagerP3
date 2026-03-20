@@ -301,11 +301,21 @@ export class ProfileHomeComponent implements OnInit {
   }
 
   checkStrength() {
+    const p = this.newMasterPassword;
+    if (!p) {
+      this.passwordStrength = 'Weak';
+      return;
+    }
 
-    const l = this.newMasterPassword.length;
+    let score = 0;
+    if (p.length > 8) score++;
+    if (p.length > 12) score++;
+    if (/[A-Z]/.test(p)) score++;
+    if (/[0-9]/.test(p)) score++;
+    if (/[^A-Za-z0-9]/.test(p)) score++;
 
-    if (l > 12) this.passwordStrength = 'Strong';
-    else if (l > 8) this.passwordStrength = 'Medium';
+    if (score >= 4) this.passwordStrength = 'Strong';
+    else if (score >= 2) this.passwordStrength = 'Medium';
     else this.passwordStrength = 'Weak';
   }
 }

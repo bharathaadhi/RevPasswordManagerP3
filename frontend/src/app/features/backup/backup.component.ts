@@ -23,6 +23,10 @@ export class BackupComponent {
   importVerificationCode = '';
 
   selectedFile: File | null = null;
+  
+  loadingCode = false;
+  exporting = false;
+  importing = false;
 
   private router = inject(Router);
 
@@ -32,18 +36,32 @@ export class BackupComponent {
 
   generateCode() {
     const email = this.api.getLoggedUser();
-    if (!email) return;
+    if (!email || this.loadingCode) return;
 
-    this.api.generateVaultCode(email).subscribe();
+    this.loadingCode = true;
+    this.api.generateVaultCode(email).subscribe({
+      next: () => {
+        this.loadingCode = false;
+      },
+      error: (err) => {
+        this.loadingCode = false;
+        console.error('Failed to generate code:', err);
+      }
+    });
   }
 
   // ================= EXPORT =================
 
   exportVault() {
-
     const userId = localStorage.getItem('userId');
-    if (!userId) return;
+    if (!userId || this.exporting) return;
 
+    if (!this.exportMasterPassword || !this.exportVerificationCode) {
+      alert("Please enter both Master Password and Verification Code");
+      return;
+    }
+
+    this.exporting = true;
     const payload = {
       userId: Number(userId),
       email: this.api.getLoggedUser(),
@@ -54,6 +72,13 @@ export class BackupComponent {
     this.api.exportVaultSecure(payload)
       .subscribe({
         next: (data: any[]) => {
+          this.exporting = false;
+          
+          if (!data || data.length === 0) {
+            alert("Your vault is empty. Nothing to export.");
+            return;
+          }
+
           // Create JSON blob
           const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
           const url = window.URL.createObjectURL(blob);
@@ -65,8 +90,11 @@ export class BackupComponent {
 
           window.URL.revokeObjectURL(url);
           alert("Vault Exported Successfully");
+          this.exportMasterPassword = '';
+          this.exportVerificationCode = '';
         },
         error: (err) => {
+          this.exporting = false;
           const msg = err?.error?.message || err?.error || "Export Failed: Invalid Credentials";
           alert(typeof msg === 'string' ? msg : JSON.stringify(msg));
         }
@@ -80,19 +108,23 @@ export class BackupComponent {
   }
 
   importVault() {
-
-    if (!this.selectedFile) {
+    if (!this.selectedFile || this.importing) {
       alert("Select backup file");
+      return;
+    }
+
+    if (!this.importMasterPassword || !this.importVerificationCode) {
+      alert("Please enter both Master Password and Verification Code");
       return;
     }
 
     const userId = localStorage.getItem('userId');
     if (!userId) return;
 
+    this.importing = true;
     const reader = new FileReader();
 
     reader.onload = () => {
-
       try {
         const data = JSON.parse(reader.result as string);
 
@@ -106,18 +138,20 @@ export class BackupComponent {
 
         this.api.importVaultSecure(payload).subscribe({
           next: () => {
+            this.importing = false;
             alert("Import Successful");
             this.router.navigate(['/vault']);
           },
           error: (err) => {
+            this.importing = false;
             const msg = err?.error?.message || err?.error || "Import Failed: Invalid Credentials";
             alert(typeof msg === 'string' ? msg : JSON.stringify(msg));
           }
         });
       } catch (e) {
+        this.importing = false;
         alert("Invalid JSON file");
       }
-
     };
 
     reader.readAsText(this.selectedFile);

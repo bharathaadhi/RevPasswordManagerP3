@@ -13,6 +13,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
   notifications: any[] = [];
   unreadCount = 0;
   showDropdown = false;
+  processingIds = new Set<number>();
   private intervalId: any;
   private lastNotifId = -1;
 
@@ -22,6 +23,13 @@ export class NotificationComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadNotifications();
+    
+    // Auto-refresh when login occurs
+    this.api.login$.subscribe(() => {
+      console.log('[Notification] Login detected, refreshing...');
+      this.loadNotifications();
+    });
+
     if (isPlatformBrowser(this.platformId)) {
       this.intervalId = setInterval(() => this.loadNotifications(), 10000);
     }
@@ -73,7 +81,9 @@ export class NotificationComponent implements OnInit, OnDestroy {
           this.lastNotifId = Math.max(this.lastNotifId, latest.id);
           
           if (oldLastId !== -1 && latest.id > oldLastId) {
-            this.api.showSimulatedNotification(email, latest.title, latest.message);
+            console.log('[Notification] New alert received:', latest.title);
+            // Redundant simulated popup removed to reduce noise as per user request
+            // this.api.showSimulatedNotification(email, latest.title, latest.message);
           }
         }
       },
@@ -87,7 +97,9 @@ export class NotificationComponent implements OnInit, OnDestroy {
 
   markAsRead(notification: any, event: Event) {
     event.stopPropagation();
-    if (!notification || !notification.id) return;
+    if (!notification || !notification.id || this.processingIds.has(notification.id)) return;
+
+    this.processingIds.add(notification.id);
 
     this.api.markNotificationAsRead(notification.id).subscribe({
       next: () => {
@@ -95,8 +107,12 @@ export class NotificationComponent implements OnInit, OnDestroy {
         notification.readStatus = true;
         notification.isRead = true;
         this.unreadCount = Math.max(0, this.unreadCount - 1);
+        this.processingIds.delete(notification.id);
       },
-      error: (err) => console.error('Failed to mark notification as read:', err)
+      error: (err) => {
+        console.error('Failed to mark notification as read:', err);
+        this.processingIds.delete(notification.id);
+      }
     });
   }
 }

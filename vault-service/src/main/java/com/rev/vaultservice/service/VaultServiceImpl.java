@@ -99,11 +99,6 @@ public class VaultServiceImpl implements VaultService {
 
         VaultEntry vault = vaultRepository.findById(id).orElseThrow();
         
-        // OWNERSHIP CHECK
-        // We'd ideally get userId from the auth-service response, but for now we can rely on verifying identifiers.
-        // Actually, we should probably fetch the user by email to get their ID.
-        // But the current flow verifyMasterPassword returns boolean.
-        
         return AESUtil.decrypt(vault.getEncryptedPassword());
     }
     @Override

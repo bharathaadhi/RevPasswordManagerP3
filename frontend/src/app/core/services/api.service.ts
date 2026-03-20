@@ -1,14 +1,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, Subject } from 'rxjs';
 import { EmailSimulatorService } from './email-simulator.service';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
 
   BASE_URL = 'http://localhost:8080';
+  private loginSubject = new Subject<void>();
+  login$ = this.loginSubject.asObservable();
 
   constructor(private http: HttpClient, private emailSim: EmailSimulatorService) { }
+
+  notifyLogin() {
+    this.loginSubject.next();
+  }
 
   public getLoggedUser(): string {
     const email = localStorage.getItem('email');

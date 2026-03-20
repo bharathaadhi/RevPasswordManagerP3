@@ -34,13 +34,15 @@
     <!-- BUTTONS -->
     <div class="btn-group">
       <button class="gradient-btn"
-        (click)="generateCode()">
-        Get Code
+        (click)="generateCode()"
+        [disabled]="loadingCode">
+        {{ loadingCode ? 'Sending...' : 'Get Code' }}
       </button>
 
       <button class="primary-btn"
-        (click)="exportVault()">
-        Download Backup
+        (click)="exportVault()"
+        [disabled]="exporting">
+        {{ exporting ? 'Exporting...' : 'Download Backup' }}
       </button>
     </div>
 
@@ -85,13 +87,15 @@
     <!-- BUTTONS -->
     <div class="btn-group">
       <button class="gradient-btn"
-        (click)="generateCode()">
-        Get Code
+        (click)="generateCode()"
+        [disabled]="loadingCode">
+        {{ loadingCode ? 'Sending...' : 'Get Code' }}
       </button>
 
       <button class="primary-btn"
-        (click)="importVault()">
-        Upload Backup
+        (click)="importVault()"
+        [disabled]="importing">
+        {{ importing ? 'Importing...' : 'Upload Backup' }}
       </button>
     </div>
 

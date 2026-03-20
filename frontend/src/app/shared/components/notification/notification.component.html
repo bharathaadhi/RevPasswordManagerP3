@@ -32,10 +32,11 @@
         
         <button 
           class="mark-read-btn" 
-          *ngIf="!n.readStatus" 
+          *ngIf="!(n.readStatus || n.isRead || n.read)" 
           (click)="markAsRead(n, $event)"
+          [disabled]="processingIds.has(n.id)"
           title="Mark as read">
-          <i class="fas fa-check"></i>
+          <i class="fas" [ngClass]="processingIds.has(n.id) ? 'fa-spinner fa-spin' : 'fa-check'"></i>
         </button>
       </div>
     </div>
